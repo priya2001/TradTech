@@ -1,0 +1,327 @@
+import { createContext, useContext, useState, useEffect } from "react";
+
+// Mock data
+const mockUsers = [
+  { id: "1", name: "Admin User", email: "admin@example.com", role: "admin" },
+  {
+    id: "2",
+    name: "Shop Owner 1",
+    email: "shop1@example.com",
+    role: "shopkeeper",
+  },
+  {
+    id: "3",
+    name: "Shop Owner 2",
+    email: "shop2@example.com",
+    role: "shopkeeper",
+  },
+  {
+    id: "4",
+    name: "Customer 1",
+    email: "customer1@example.com",
+    role: "customer",
+  },
+  {
+    id: "5",
+    name: "Customer 2",
+    email: "customer2@example.com",
+    role: "customer",
+  },
+];
+
+const mockShops = [
+  {
+    id: "1",
+    name: "Green Juice Haven",
+    ownerId: "2",
+    location: { lat: 28.6139, lng: 77.209 },
+    address: "123 Green St, Delhi",
+    rating: 4.5,
+    machineId: "1",
+    isApproved: true,
+  },
+  {
+    id: "2",
+    name: "Solar Sips",
+    ownerId: "3",
+    location: { lat: 28.6229, lng: 77.208 },
+    address: "456 Solar Ave, Delhi",
+    rating: 4.2,
+    machineId: "2",
+    isApproved: true,
+  },
+];
+
+const mockMachines = [
+  {
+    id: "1",
+    shopId: "1",
+    batteryPercentage: 75,
+    solarEfficiency: 0.8,
+    isCharging: true,
+    speed: 70,
+    isPaymentMachineOn: true,
+    isLightOn: false,
+    fanSpeed: "medium",
+  },
+  {
+    id: "2",
+    shopId: "2",
+    batteryPercentage: 45,
+    solarEfficiency: 0.6,
+    isCharging: true,
+    speed: 60,
+    isPaymentMachineOn: true,
+    isLightOn: true,
+    fanSpeed: "low",
+  },
+];
+
+const mockOrders = [
+  {
+    id: "1",
+    customerId: "4",
+    shopId: "1",
+    glassCount: 2,
+    status: "completed",
+    timestamp: Date.now() - 86400000,
+  },
+  {
+    id: "2",
+    customerId: "5",
+    shopId: "1",
+    glassCount: 1,
+    status: "processing",
+    timestamp: Date.now() - 3600000,
+  },
+];
+
+const mockRegistrations = [
+  {
+    id: "1",
+    shopkeeperId: "3",
+    shopName: "Eco Juice Corner",
+    address: "789 Eco Blvd, Delhi",
+    location: { lat: 28.6329, lng: 77.2195 },
+    machineId: "3",
+    status: "pending",
+    timestamp: Date.now() - 172800000,
+  },
+];
+
+const AppContext = createContext({
+  currentUser: null,
+  users: [],
+  shops: [],
+  machines: [],
+  orders: [],
+  registrations: [],
+  login: () => Promise.resolve(false),
+  logout: () => {},
+  signup: () => Promise.resolve(false),
+  updateMachine: () => {},
+  createOrder: () => "",
+  updateOrderStatus: () => {},
+  submitShopRegistration: () => "",
+  approveShopRegistration: () => {},
+  rejectShopRegistration: () => {},
+  userLocation: null,
+  setUserLocation: () => {},
+  selectedShop: null,
+  setSelectedShop: () => {},
+  getShopById: () => undefined,
+  getMachineByShopId: () => undefined,
+});
+
+export const AppProvider = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [users, setUsers] = useState(mockUsers);
+  const [shops, setShops] = useState(mockShops);
+  const [machines, setMachines] = useState(mockMachines);
+  const [orders, setOrders] = useState(mockOrders);
+  const [registrations, setRegistrations] = useState(mockRegistrations);
+  const [userLocation, setUserLocation] = useState(null);
+  const [selectedShop, setSelectedShop] = useState(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMachines((prev) =>
+        prev.map((machine) => {
+          let batteryChange = 0;
+          if (machine.isCharging)
+            batteryChange += 0.05 * machine.solarEfficiency;
+          if (machine.isPaymentMachineOn) batteryChange -= 0.001;
+          if (machine.isLightOn) batteryChange -= 0.002;
+          if (machine.fanSpeed === "low") batteryChange -= 0.003;
+          else if (machine.fanSpeed === "medium") batteryChange -= 0.005;
+          else if (machine.fanSpeed === "high") batteryChange -= 0.008;
+
+          const newBattery = Math.max(
+            0,
+            Math.min(100, machine.batteryPercentage + batteryChange)
+          );
+          return { ...machine, batteryPercentage: newBattery };
+        })
+      );
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const login = async (email, password, role) => {
+    const user = users.find(
+      (user) => user.email === email && user.role === role
+    );
+    if (user) {
+      setCurrentUser(user);
+      return true;
+    }
+    return false;
+  };
+
+  const logout = () => {
+    setCurrentUser(null);
+  };
+
+  const signup = async (name, email, password, role) => {
+    if (users.some((user) => user.email === email)) {
+      return false;
+    }
+    const newUser = {
+      id: `user-${Date.now()}`,
+      name,
+      email,
+      role,
+    };
+    setUsers((prev) => [...prev, newUser]);
+    setCurrentUser(newUser);
+    return true;
+  };
+
+  const updateMachine = (machineId, updates) => {
+    setMachines((prev) =>
+      prev.map((machine) =>
+        machine.id === machineId ? { ...machine, ...updates } : machine
+      )
+    );
+  };
+
+  const createOrder = (customerId, shopId, glassCount) => {
+    const orderId = `order-${Date.now()}`;
+    const newOrder = {
+      id: orderId,
+      customerId,
+      shopId,
+      glassCount,
+      status: "pending",
+      timestamp: Date.now(),
+    };
+    setOrders((prev) => [...prev, newOrder]);
+    return orderId;
+  };
+
+  const updateOrderStatus = (orderId, status) => {
+    setOrders((prev) =>
+      prev.map((order) => (order.id === orderId ? { ...order, status } : order))
+    );
+  };
+
+  const submitShopRegistration = (registration) => {
+    const registrationId = `reg-${Date.now()}`;
+    const newRegistration = {
+      ...registration,
+      id: registrationId,
+      status: "pending",
+      timestamp: Date.now(),
+    };
+    setRegistrations((prev) => [...prev, newRegistration]);
+    return registrationId;
+  };
+
+  const approveShopRegistration = (registrationId) => {
+    const registration = registrations.find((r) => r.id === registrationId);
+    if (!registration) return;
+
+    setRegistrations((prev) =>
+      prev.map((reg) =>
+        reg.id === registrationId ? { ...reg, status: "approved" } : reg
+      )
+    );
+
+    const newShop = {
+      id: `shop-${Date.now()}`,
+      name: registration.shopName,
+      ownerId: registration.shopkeeperId,
+      location: registration.location,
+      address: registration.address,
+      rating: 0,
+      machineId: registration.machineId,
+      isApproved: true,
+    };
+
+    setShops((prev) => [...prev, newShop]);
+
+    if (!registration.machineId) {
+      const newMachine = {
+        id: `machine-${Date.now()}`,
+        shopId: newShop.id,
+        batteryPercentage: 100,
+        solarEfficiency: 0.7,
+        isCharging: true,
+        speed: 50,
+        isPaymentMachineOn: true,
+        isLightOn: false,
+        fanSpeed: "off",
+      };
+      setMachines((prev) => [...prev, newMachine]);
+    }
+  };
+
+  const rejectShopRegistration = (registrationId) => {
+    setRegistrations((prev) =>
+      prev.map((reg) =>
+        reg.id === registrationId ? { ...reg, status: "rejected" } : reg
+      )
+    );
+  };
+
+  const getShopById = (shopId) => {
+    return shops.find((shop) => shop.id === shopId);
+  };
+
+  const getMachineByShopId = (shopId) => {
+    return machines.find((machine) => machine.shopId === shopId);
+  };
+
+  return (
+    <AppContext.Provider
+      value={{
+        currentUser,
+        users,
+        shops,
+        machines,
+        orders,
+        registrations,
+        login,
+        logout,
+        signup,
+        updateMachine,
+        createOrder,
+        updateOrderStatus,
+        submitShopRegistration,
+        approveShopRegistration,
+        rejectShopRegistration,
+        userLocation,
+        setUserLocation,
+        selectedShop,
+        setSelectedShop,
+        getShopById,
+        getMachineByShopId,
+      }}
+    >
+      {children}
+    </AppContext.Provider>
+  );
+};
+
+export const useAppContext = () => useContext(AppContext);
