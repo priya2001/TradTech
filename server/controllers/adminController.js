@@ -5,6 +5,10 @@ import { promisify } from 'util';
 import AppError from '../utils/appError.js';
 import catchAsync from '../utils/catchAsync.js';
 import sendEmail from '../utils/email.js';
+import { SHOPKEEPER_APPROVAL_EMAIL_TEMPLATE, 
+  SHOPKEEPER_REJECTION_EMAIL_TEMPLATE
+} from '../utils/emailTemplates.js';
+import Customer from '../models/Customer.js';
 
 // Helper function to sign JWT token
 const signToken = id => {
@@ -65,6 +69,7 @@ export const login = catchAsync(async (req, res, next) => {
 
   // 2) Check if admin exists && password is correct
   const admin = await Admin.findOne({ email }).select('+password');
+  console.log("admin : ",admin);
   if (!admin || !(await admin.correctPassword(password, admin.password))) {
     return next(new AppError('Incorrect email or password', 401));
   }
@@ -106,7 +111,9 @@ export const approveShopkeeper = catchAsync(async (req, res, next) => {
   await sendEmail({
     email: shopkeeper.email,
     subject: 'Your Shop Registration Has Been Approved',
-    message: `Congratulations! Your shop "${shopkeeper.shopName}" has been approved. You can now log in and start using the platform.`
+    message: SHOPKEEPER_APPROVAL_EMAIL_TEMPLATE
+      .replace('{shopName}', shopkeeper.shopName)
+      .replace('{loginUrl}', 'https://yourplatform.com/login')
   });
 
   res.status(200).json({
@@ -126,12 +133,18 @@ export const rejectShopkeeper = catchAsync(async (req, res, next) => {
   if (!shopkeeper) {
     return next(new AppError('No shopkeeper found with that ID', 404));
   }
+  let rejectionReason = req.body.rejectionReason || 'Does not meet our current marketplace requirements.';
 
   // Send rejection email to shopkeeper
   await sendEmail({
     email: shopkeeper.email,
     subject: 'Your Shop Registration Has Been Rejected',
-    message: `We regret to inform you that your shop registration for "${shopkeeper.shopName}" has been rejected. Please contact support for more information.`
+    message: SHOPKEEPER_REJECTION_EMAIL_TEMPLATE
+      .replace('{shopName}', shopkeeper.shopName)
+      .replace('{rejectionReason}', rejectionReason || 'Does not meet our current marketplace requirements.')
+      .replace('{supportEmail}', 'support@tradtech.com')
+      .replace('{supportUrl}', 'https://tradtech.com/contact')
+      .replace('{reapplyAfterDays}', '30')
   });
 
   res.status(204).json({
@@ -249,11 +262,17 @@ export const updatePassword = catchAsync(async (req, res, next) => {
 export const protect = catchAsync(async (req, res, next) => {
   // 1) Getting token and check if it's there
   let token;
+  
+  // Check Authorization header first
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } 
+  // If not in header, check query parameters
+  else if (req.query.Authorization && req.query.Authorization.startsWith('Bearer')) {
+    token = req.query.Authorization.split(' ')[1];
   }
 
   if (!token) {

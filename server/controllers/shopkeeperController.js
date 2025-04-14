@@ -4,6 +4,8 @@ import { promisify } from 'util';
 import AppError from '../utils/appError.js';
 import catchAsync from '../utils/catchAsync.js';
 import sendEmail from '../utils/email.js';
+import Admin from '../models/Admin.js'; 
+import { SHOPKEEPER_APPROVAL_EMAIL_REQUEST_TEMPLATE } from '../utils/emailTemplates.js';
 
 // Helper function to sign JWT token
 const signToken = id => {
@@ -61,17 +63,21 @@ export const signup = catchAsync(async (req, res, next) => {
         active: false // Default to inactive until approved by admin
     });
 
-    // // Send email to admin for approval
-    // const approvalUrl = `${req.protocol}://${req.get('host')}/api/admin/approve-shopkeeper/${newShopkeeper._id}`;
+    // Send email to admin for approval
+    const approvalUrl = `${req.protocol}://${req.get('host')}/api/admin/approve-shopkeeper/${newShopkeeper._id}`;
 
-    // await sendEmail({
-    //     email: process.env.ADMIN_EMAIL,
-    //     subject: 'New Shopkeeper Approval Request',
-    //     message: `A new shopkeeper has registered and requires approval:\n\n` +
-    //         `Shop Name: ${shopName}\n` +
-    //         `License Number: ${licenseNumber}\n` +
-    //         `Approve here: ${approvalUrl}`
-    // });
+    // Get single admin email
+    const admin = await Admin.findOne({ role: 'admin' }).select('email');
+
+    // Send to admin (email comes from TradTech)
+    await sendEmail({
+        email: admin || process.env.ADMIN_EMAIL, // Or from your config
+        subject: 'New Shopkeeper Approval Request',
+        message: SHOPKEEPER_APPROVAL_EMAIL_REQUEST_TEMPLATE
+            .replace('{shopName}', newShopkeeper.shopName)
+            .replace('{licenseNumber}', newShopkeeper.licenseNumber)
+            .replace('{approvalUrl}', approvalUrl)
+    });
 
     res.status(201).json({
         status: 'success',
@@ -98,14 +104,14 @@ export const login = catchAsync(async (req, res, next) => {
         if (!email || !password) {
             return next(new AppError('Please provide email and password!', 400));
         }
-    
-    
+
+
         // 2) Check if shopkeeper exists && password is correct
         const shopkeeper = await Shopkeeper.findOne({ email, active: true }).select('+password');
         if (!shopkeeper || !(await shopkeeper.correctPassword(password, shopkeeper.password))) {
             return next(new AppError('Incorrect email or password', 401));
         }
-    
+
         // 3) If everything ok, send token to client
         createSendToken(shopkeeper, 200, res);
     } catch (error) {

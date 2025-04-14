@@ -33,7 +33,7 @@ const orderSchema = new mongoose.Schema({
   },
   deliveryAddress: {
     type: String,
-    required: [true, 'Delivery address is required']
+    // required: [true, 'Delivery address is required']
   },
   status: {
     type: String,
