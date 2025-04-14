@@ -17,7 +17,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAppContext } from "@/lib/context";
 
 const AuthForm = () => {
-  const { login, signup } = useAppContext();
+  const { login, signup, shopkeepersignup } = useAppContext();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("login");
@@ -29,25 +29,26 @@ const AuthForm = () => {
   const [signupName, setSignupName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
+  const [signupPasswordConfirm, setSignupPasswordConfirm] = useState("");
   const [signupRole, setSignupRole] = useState("customer");
+
+  const [shopName, setShopName] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [licenseNumber, setLicenseNumber] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const success = await login(loginEmail, loginPassword, loginRole);
+
       if (success) {
         toast({
           title: "Login successful",
           description: "You have been logged in successfully.",
         });
-
-        if (loginRole === "customer") {
-          navigate("/customer");
-        } else if (loginRole === "shopkeeper") {
-          navigate("/shopkeeper");
-        } else if (loginRole === "admin") {
-          navigate("/admin");
-        }
+        navigate(`/${loginRole}`);
       } else {
         toast({
           title: "Login failed",
@@ -66,39 +67,105 @@ const AuthForm = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    try {
-      const success = await signup(
-        signupName,
-        signupEmail,
-        signupPassword,
-        signupRole
-      );
-      if (success) {
-        toast({
-          title: "Signup successful",
-          description: "Your account has been created successfully.",
-        });
 
-        if (signupRole === "customer") {
-          navigate("/customer");
-        } else if (signupRole === "shopkeeper") {
-          navigate("/shopkeeper");
+    // Frontend Validation
+    if (signupPassword !== signupPasswordConfirm) {
+      alert("Password and Confirm Password do not match");
+      return;
+    }
+
+    if (!signupName || !signupEmail || !signupPassword || !signupRole) {
+      alert("Please fill all required fields.");
+      return;
+    }
+
+    if (signupRole === "shopkeeper") {
+      if (
+        !shopName ||
+        !mobileNumber ||
+        !licenseNumber ||
+        !longitude ||
+        !latitude
+      ) {
+        alert("Please fill all shopkeeper-specific fields.");
+        return;
+      }
+
+      if (!/^\d{10}$/.test(mobileNumber)) {
+        alert("Phone number must be exactly 10 digits.");
+        return;
+      }
+
+      const payload = {
+        name: signupName,
+        email: signupEmail,
+        password: signupPassword,
+        shopName,
+        mobileNumber,
+        licenseNumber,
+        address: {
+          location: {
+            coordinates: [parseFloat(longitude), parseFloat(latitude)],
+          },
+          fullAddress: "Demo address",
+        },
+      };
+
+      try {
+        const success = await shopkeepersignup(payload);
+        console.log(success);
+        if (success) {
+          toast({
+            title: "Signup successful",
+            description: "Pending for approval.",
+          });
+          setActiveTab("login");
+        } else {
+          toast({
+            title: "Signup failed",
+            description: "Could not create account.",
+            variant: "destructive",
+          });
         }
-      } else {
+      } catch (err) {
         toast({
-          title: "Signup failed",
-          description: "Email already exists or invalid data.",
+          title: "Signup error",
+          description: "An error occurred during signup.",
           variant: "destructive",
         });
       }
-    } catch (error) {
-      toast({
-        title: "Signup error",
-        description: "An error occurred during signup.",
-        variant: "destructive",
-      });
+    } else {
+      try {
+        const success = await signup(
+          signupName,
+          signupEmail,
+          signupPassword,
+          signupRole
+        );
+
+        if (success) {
+          toast({
+            title: "Signup successful",
+            description: "You can now log in with your credentials.",
+          });
+          setActiveTab("login");
+        } else {
+          toast({
+            title: "Signup failed",
+            description: "Email already in use.",
+            variant: "destructive",
+          });
+        }
+      } catch (err) {
+        toast({
+          title: "Signup error",
+          description: "An error occurred during signup.",
+          variant: "destructive",
+        });
+      }
     }
   };
+
 
   return (
     <Card className="w-full max-w-md mx-auto shadow-lg">
@@ -112,33 +179,28 @@ const AuthForm = () => {
           <form onSubmit={handleLogin}>
             <CardHeader>
               <CardTitle>Login</CardTitle>
-              <CardDescription>
-                Enter your credentials to access your account
-              </CardDescription>
+              <CardDescription>Enter your credentials</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="login-email">Email</Label>
+              <div>
+                <Label>Email</Label>
                 <Input
-                  id="login-email"
                   type="email"
-                  placeholder="you@example.com"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="login-password">Password</Label>
+              <div>
+                <Label>Password</Label>
                 <Input
-                  id="login-password"
                   type="password"
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   required
                 />
               </div>
-              <div className="space-y-2">
+              <div>
                 <Label>I am a:</Label>
                 <RadioGroup value={loginRole} onValueChange={setLoginRole}>
                   <div className="flex items-center space-x-2">
@@ -167,45 +229,93 @@ const AuthForm = () => {
         <TabsContent value="signup">
           <form onSubmit={handleSignup}>
             <CardHeader>
-              <CardTitle>Create an account</CardTitle>
-              <CardDescription>
-                Enter your information to create an account
-              </CardDescription>
+              <CardTitle>Signup</CardTitle>
+              <CardDescription>Create your account</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="signup-name">Full Name</Label>
+              <div>
+                <Label>Full Name</Label>
                 <Input
-                  id="signup-name"
-                  placeholder="John Doe"
                   value={signupName}
                   onChange={(e) => setSignupName(e.target.value)}
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="signup-email">Email</Label>
+              <div>
+                <Label>Email</Label>
                 <Input
-                  id="signup-email"
                   type="email"
-                  placeholder="you@example.com"
                   value={signupEmail}
                   onChange={(e) => setSignupEmail(e.target.value)}
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="signup-password">Password</Label>
+              <div>
+                <Label>Password</Label>
                 <Input
-                  id="signup-password"
                   type="password"
                   value={signupPassword}
                   onChange={(e) => setSignupPassword(e.target.value)}
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <Label>I want to register as:</Label>
+              {signupRole === "shopkeeper" && (
+                <>
+                  <div>
+                    <Label>Confirm Password</Label>
+                    <Input
+                      type="password"
+                      value={signupPasswordConfirm}
+                      onChange={(e) => setSignupPasswordConfirm(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>Shop Name</Label>
+                    <Input
+                      value={shopName}
+                      onChange={(e) => setShopName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>Mobile Number</Label>
+                    <Input
+                      value={mobileNumber}
+                      onChange={(e) => setMobileNumber(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>License Number</Label>
+                    <Input
+                      value={licenseNumber}
+                      onChange={(e) => setLicenseNumber(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="flex space-x-2">
+                    <div>
+                      <Label>Latitude</Label>
+                      <Input
+                        value={latitude}
+                        onChange={(e) => setLatitude(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label>Longitude</Label>
+                      <Input
+                        value={longitude}
+                        onChange={(e) => setLongitude(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+              <div>
+                <Label>Register as:</Label>
                 <RadioGroup value={signupRole} onValueChange={setSignupRole}>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="customer" id="signup-customer" />
@@ -220,7 +330,7 @@ const AuthForm = () => {
             </CardContent>
             <CardFooter>
               <Button type="submit" className="w-full">
-                Create account
+                Create Account
               </Button>
             </CardFooter>
           </form>

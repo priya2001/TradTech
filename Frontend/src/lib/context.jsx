@@ -133,6 +133,7 @@ const AppContext = createContext({
   getMachineByShopId: () => undefined,
 });
 
+
 export const AppProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState(mockUsers);
@@ -142,6 +143,47 @@ export const AppProvider = ({ children }) => {
   const [registrations, setRegistrations] = useState(mockRegistrations);
   const [userLocation, setUserLocation] = useState(null);
   const [selectedShop, setSelectedShop] = useState(null);
+
+
+
+const SHOPKEEPER_API_BASE = "http://localhost:3000/api"; // update this if needed
+
+
+  const signupShopkeeperAPI = async (payload) => {
+    try {
+      const res = await fetch(`${SHOPKEEPER_API_BASE}/shopkeepers/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      console.log(data);
+      if (res.ok && data) {
+        return data; // ✅ Return full data if signup is successful
+      } else {
+        console.error("Signup failed:", data);
+        return null; // ❌ Return null if signup failed
+      }
+    } catch (error) {
+      console.error("Error during signup:", error);
+      return null;
+    }
+  };
+
+
+  
+  
+  const loginShopkeeperAPI = async (email, password) => {
+    console.log(email, password);
+  const res = await fetch(`${SHOPKEEPER_API_BASE}/shopkeepers/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!res.ok) throw new Error("Login failed");
+  return res.json();
+};
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -169,34 +211,89 @@ export const AppProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password, role) => {
-    const user = users.find(
-      (user) => user.email === email && user.role === role
-    );
-    if (user) {
-      setCurrentUser(user);
-      return true;
+    if (role === "shopkeeper") {
+      // console.log(email);
+      try {
+        const data = await loginShopkeeperAPI(email, password);
+        
+        if (data.data.active === false) {
+          alert("Approval pending ");
+          return false;
+         } 
+        const user = {
+          role: 'shopkeeper',
+          data: data.data
+
+        }
+        setCurrentUser(user);
+        return true;
+      } catch (err) {
+        console.error("Shopkeeper Login Error:", err);
+        return false;
+      }
+    } else {
+      // Customer or Admin Login with mock
+      const user = users.find(
+        (user) => user.email === email && user.role === role
+      );
+      if (user) {
+        setCurrentUser(user);
+        return true;
+      }
+      return false;
     }
-    return false;
   };
+
 
   const logout = () => {
     setCurrentUser(null);
   };
 
-  const signup = async (name, email, password, role) => {
-    if (users.some((user) => user.email === email)) {
+ const signup = async (
+   name,
+   email,
+   password,
+   role
+ )=>{
+     // Customer or Admin Signup with mock
+     if (users.some((user) => user.email === email)) return false;
+
+     const newUser = {
+       id: `user-${Date.now()}`,
+       name,
+       email,
+       role,
+     };
+     setUsers((prev) => [...prev, newUser]);
+     setCurrentUser(newUser);
+     return true;
+   
+  };
+  
+  const shopkeepersignup = async (payload) => {
+    try {
+      const data = await signupShopkeeperAPI(payload);
+      console.log(2);
+      console.log(data);
+      if (data.status==="success") {
+        const newUser = {
+          id: data.data._id,
+          name: data.data.name,
+          email: data.data.email,
+          role: "shopkeeper",
+        };
+
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      console.error("Shopkeeper Signup Error:", err);
       return false;
     }
-    const newUser = {
-      id: `user-${Date.now()}`,
-      name,
-      email,
-      role,
-    };
-    setUsers((prev) => [...prev, newUser]);
-    setCurrentUser(newUser);
-    return true;
   };
+
+
 
   const updateMachine = (machineId, updates) => {
     setMachines((prev) =>
@@ -305,6 +402,7 @@ export const AppProvider = ({ children }) => {
         login,
         logout,
         signup,
+        shopkeepersignup,
         updateMachine,
         createOrder,
         updateOrderStatus,

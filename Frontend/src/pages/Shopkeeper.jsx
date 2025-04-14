@@ -21,10 +21,10 @@ const Shopkeeper = () => {
     updateOrderStatus,
     machines,
     updateMachine,
-    submitShopRegistration,
+   
   } = useAppContext();
 
-  const [submittingRegistration, setSubmittingRegistration] = useState(false);
+  
 
   useEffect(() => {
     if (!currentUser) {
@@ -37,16 +37,16 @@ const Shopkeeper = () => {
   if (!currentUser || currentUser.role !== "shopkeeper") {
     return null;
   }
+console.log(currentUser)
+  const userShop = currentUser.data.shopkeeper;
 
-  const userShop = shops.find(
-    (shop) => shop.ownerId === currentUser.id && shop.isApproved
-  );
+  
 
-  const machine = userShop && machines.find((m) => m.shopId === userShop.id);
+  const machine = userShop && machines.find((m) => m.shopId === '1');
 
   const shopOrders = userShop
     ? orders
-        .filter((order) => order.shopId === userShop.id)
+        .filter((order) => order.shopId === 1)
         .sort((a, b) => b.timestamp - a.timestamp)
     : [];
 
@@ -66,31 +66,14 @@ const Shopkeeper = () => {
     });
   };
 
-  const handleRegisterShop = () => {
-    setSubmittingRegistration(true);
-
-    setTimeout(() => {
-      submitShopRegistration({
-        shopkeeperId: currentUser.id,
-        shopName: "New Juice Shop",
-        address: "123 Example Street",
-        location: { lat: 28.6139, lng: 77.209 },
-      });
-
-      toast({
-        title: "Registration submitted",
-        description: "Your shop registration has been submitted for approval",
-      });
-
-      setSubmittingRegistration(false);
-    }, 1500);
-  };
+ 
 
   const goToMachineDetails = () => {
     if (userShop) {
-      navigate(`/machine/${userShop.id}`);
+      navigate(`/machine/${'1'}`);
     }
   };
+  
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -114,12 +97,13 @@ const Shopkeeper = () => {
                 <CardContent>
                   <div className="mb-4">
                     <div className="text-sm text-gray-500">Address</div>
-                    <div>{userShop.address}</div>
+                    {/* <div>{userShop.address}</div> */}
+                    <div>Dummy address</div>
                   </div>
 
                   <div className="mb-4">
                     <div className="text-sm text-gray-500">Rating</div>
-                    <div className="font-semibold">{userShop.rating}★</div>
+                    <div className="font-semibold">4★</div>
                   </div>
                 </CardContent>
               </Card>
@@ -237,18 +221,9 @@ const Shopkeeper = () => {
         ) : (
           <div className="text-center py-10">
             <h2 className="text-xl font-bold mb-2">
-              You don't have a registered shop yet
+              Your shop is not approved.
             </h2>
-            <p className="text-gray-600 mb-6">
-              Register your shop to start using the solar-powered sugarcane
-              juice system
-            </p>
-            <Button
-              onClick={handleRegisterShop}
-              disabled={submittingRegistration}
-            >
-              {submittingRegistration ? "Submitting..." : "Register Your Shop"}
-            </Button>
+
           </div>
         )}
       </main>
