@@ -71,7 +71,12 @@ const shopkeeperSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
         select: false
-    }
+    },
+    role: {
+        type: String,
+        enum: ['user', 'admin', 'customer'], // Only allow these values
+        default: 'customer' // Default role for new customers
+      }
 });
 
 // Index for geospatial queries

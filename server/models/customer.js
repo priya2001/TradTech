@@ -21,6 +21,11 @@ const customerSchema = new mongoose.Schema({
     minlength: 8,
     select: false
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin', 'customer'], // Only allow these values
+    default: 'user' // Default role for new customers
+  },
   profilePic: {
     type: String,
     default: 'default.jpg'

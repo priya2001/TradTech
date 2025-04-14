@@ -4,49 +4,40 @@ const orderSchema = new mongoose.Schema({
   customer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Customer',
-    required: [true, 'Order must belong to a customer']
+    required: true
   },
-  juice: {
+  shop: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'SugarcaneJuice',
-    required: [true, 'Order must be for a juice product']
+    ref: 'Shopkeeper', 
+    required: true
   },
-  orderedQuantity: {
-    volume: {
-      type: Number,
-      required: [true, 'Must specify volume ordered'],
-      min: [100, 'Minimum volume is 100ml']
-    },
-    price: {
-      type: Number,
-      required: [true, 'Must specify price per unit']
-    },
-    quantity: {
-      type: Number,
-      required: [true, 'Must specify number of units'],
-      min: [1, 'Minimum order quantity is 1']
-    }
-  },
-  totalAmount: {
+  glassSize: {
     type: Number,
-    required: [true, 'Order must have a total amount']
+    enum: [250, 500], // Only 250ml or 500ml
+    required: true
   },
-  deliveryAddress: {
-    type: String,
-    // required: [true, 'Delivery address is required']
+  quantity: {
+    type: Number,
+    min: 1,
+    required: true
+  },
+  pricePerGlass: { // Price based on glassSize (set by shop)
+    type: Number,
+    required: true
+  },
+  totalAmount: { // Auto-calculated (pricePerGlass × quantity)
+    type: Number,
+    required: true
   },
   status: {
     type: String,
-    enum: {
-      values: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
-      message: 'Status is either: pending, processing, shipped, delivered, or cancelled'
-    },
+    enum: ['pending', 'preparing', 'ready', 'picked-up', 'cancelled'],
     default: 'pending'
   },
   paymentMethod: {
     type: String,
     enum: ['cash', 'card', 'online'],
-    required: [true, 'Payment method is required']
+    required: true
   },
   paymentStatus: {
     type: String,
@@ -57,26 +48,18 @@ const orderSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  deliveredAt: Date
-}, {
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
+  readyAt: Date,
+  pickedUpAt: Date
 });
 
-// Calculate total amount before saving
-orderSchema.pre('save', function(next) {
-  this.totalAmount = this.orderedQuantity.price * this.orderedQuantity.quantity;
-  next();
-});
-
-// Populate customer and juice details when querying
+// Populate customer, shop, and juice details when querying
 orderSchema.pre(/^find/, function(next) {
   this.populate({
     path: 'customer',
     select: 'name email mobileNumber'
   }).populate({
-    path: 'juice',
-    select: 'name'
+    path: 'shop',
+    select: 'shopName address mobileNumber' // Include shop details you want to show
   });
   next();
 });

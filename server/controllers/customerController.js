@@ -1,5 +1,4 @@
 import Customer from '../models/Customer.js';
-import Juice from '../models/Juice.js';
 import Order from '../models/Order.js';
 import AppError from '../utils/appError.js';
 import catchAsync from '../utils/catchAsync.js';
@@ -172,22 +171,29 @@ export const updateMe = catchAsync(async (req, res, next) => {
 // @route   POST /api/customers/order-juice
 // @access  Private
 export const orderJuice = catchAsync(async (req, res, next) => {
-  // 1) Get the juice and check if it exists
-  const juice = await Juice.findById(req.body.juiceId);
-  if (!juice) {
-    return next(new AppError('No juice found with that ID', 404));
+  const { shopId, glassSize, quantity, paymentMethod } = req.body;
+
+  // Validate input
+  if (!shopId || !glassSize || !quantity || !paymentMethod) {
+    return next(new AppError('Missing required fields: shopId, glassSize, quantity, paymentMethod', 400));
   }
 
-  // 2) Create order
+  // Get price per glass (set by shop, e.g., 500ml = ₹60, 250ml = ₹35)
+  const pricePerGlass = glassSize === 500 ? 60 : 35; // Adjust prices as needed
+
+  // Create order
   const order = await Order.create({
-    juice: req.body.juiceId,
+    shop: shopId,
     customer: req.customer.id,
-    quantity: req.body.quantity,
-    price: juice.price * req.body.quantity,
-    deliveryAddress: req.body.deliveryAddress || req.customer.address
+    glassSize,
+    quantity,
+    pricePerGlass,
+    paymentMethod,
+    totalAmount: pricePerGlass * quantity, // Could also let pre-save hook handle it
+    status: 'pending'
   });
 
-  // 3) Update customer's order history
+  // Update customer's order history (optional)
   await Customer.findByIdAndUpdate(
     req.customer.id,
     { $push: { orders: order._id } },
@@ -196,25 +202,40 @@ export const orderJuice = catchAsync(async (req, res, next) => {
 
   res.status(201).json({
     status: 'success',
-    data: {
-      order
-    }
+    data: { order }
   });
 });
 
-// @desc    Get customer's order history
+// @desc    Get all orders (pending + successful) for a customer
 // @route   GET /api/customers/my-orders
 // @access  Private
 export const getMyOrders = catchAsync(async (req, res, next) => {
-  const orders = await Order.find({ customer: req.customer.id })
-    .populate('juice')
-    .sort('-createdAt');
+  // 1) Fetch all orders for the customer (pending, ready, picked-up)
+  const orders = await Order.find({
+    customer: req.customer.id,
+    status: { $in: ['pending', 'preparing', 'ready', 'picked-up'] } // Exclude cancelled
+  })
+    .populate({
+      path: 'shop',
+      select: 'shopName address.location mobileNumber' // Shop details
+    })
+    .sort('-orderedAt'); // Newest first
 
+  // 2) Separate into pending vs. completed
+  const pendingOrders = orders.filter(
+    order => order.status === 'pending' || order.status === 'preparing'
+  );
+  const completedOrders = orders.filter(
+    order => order.status === 'ready' || order.status === 'picked-up'
+  );
+
+  // 3) Send structured response
   res.status(200).json({
     status: 'success',
-    results: orders.length,
     data: {
-      orders
+      pending: pendingOrders,
+      completed: completedOrders,
+      totalOrders: orders.length
     }
   });
 });
@@ -224,11 +245,17 @@ export const getMyOrders = catchAsync(async (req, res, next) => {
 export const protect = catchAsync(async (req, res, next) => {
   // 1) Getting token and check if it's there
   let token;
+
+  // Check Authorization header first
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } 
+  // If not in header, check query parameters
+  else if (req.query.Authorization && req.query.Authorization.startsWith('Bearer')) {
+    token = req.query.Authorization.split(' ')[1];
   }
 
   if (!token) {
@@ -263,11 +290,10 @@ export const protect = catchAsync(async (req, res, next) => {
 // @desc    Restrict middleware (used in routes)
 // @access  Private/Admin
 export const restrictTo = (...roles) => {
+  console.log('Restricting to roles:', roles); // Add this
   return (req, res, next) => {
-    if (!roles.includes(req.customer.role)) {
-      return next(
-        new AppError('You do not have permission to perform this action', 403)
-      );
+    if (!req.user || !roles.includes(req.user.role)) { // Fix: req.user instead of req.customer
+      return next(new AppError('No permission!', 403));
     }
     next();
   };

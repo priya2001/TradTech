@@ -23,8 +23,8 @@ const adminSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin'],
-    default: 'admin'
+    enum: ['user', 'admin', 'customer'], // Only allow these values
+    default: 'admin' // Default role for new customers
   },
   profilePic: {
     type: String,

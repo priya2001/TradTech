@@ -130,4 +130,4 @@ Manages juice shops (requires admin approval).
    - `npm install bcryptjs validator jsonwebtoken mongoose nodemailer`
 
 ## Run the Server:
-   - `npm run dev`
+   - `npm run server`

@@ -10,7 +10,6 @@ import {
   protect,
   restrictTo
 } from '../controllers/customerController.js';
-import { protectCustomer } from '../middleware/authCustomer.js';
 
 const router = express.Router();
 
