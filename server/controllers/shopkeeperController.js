@@ -223,12 +223,17 @@ export const updateMe = catchAsync(async (req, res, next) => {
 export const protect = catchAsync(async (req, res, next) => {
     // 1) Getting token and check if it's there
     let token;
-    if (
-        req.headers.authorization &&
-        req.headers.authorization.startsWith('Bearer')
-    ) {
-        token = req.headers.authorization.split(' ')[1];
-    }
+    // Check Authorization header first
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  } 
+  // If not in header, check query parameters
+  else if (req.query.Authorization && req.query.Authorization.startsWith('Bearer')) {
+    token = req.query.Authorization.split(' ')[1];
+  }
 
     if (!token) {
         return next(
