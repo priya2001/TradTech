@@ -109,6 +109,8 @@ export const login = catchAsync(async (req, res, next) => {
         // 2) Check if shopkeeper exists && password is correct
         const shopkeeper = await Shopkeeper.findOne({ email, active: true }).select('+password');
         if (!shopkeeper || !(await shopkeeper.correctPassword(password, shopkeeper.password))) {
+            
+           
             return next(new AppError('Incorrect email or password', 401));
         }
 

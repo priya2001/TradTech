@@ -7,6 +7,7 @@ import connectCloudinary from './config/cloudinary.js'
 import customerRoutes from './routes/customerRoutes.js';
 import shopkeeperRoutes from './routes/shopkeeperRoutes.js';
 import adminRouter from './routes/adminRoutes.js';
+import authRoute from './routes/authRoute.js'
 
 
 
@@ -34,6 +35,7 @@ app.get('/',(req,res) => res.send("API working"));
 app.use('/api/customers', customerRoutes);
 app.use('/api/shopkeepers', shopkeeperRoutes);
 app.use('/api/admin', adminRouter);
+app.use("/api/auth", authRoute);
 
 
 // port
