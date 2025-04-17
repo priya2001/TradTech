@@ -173,3 +173,59 @@ export const SHOPKEEPER_REJECTION_EMAIL_TEMPLATE = `
 </body>
 </html>
 `;
+
+// emailTemplates.js
+export const PASSWORD_RESET_OTP_EMAIL_TEMPLATE = `
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .otp-code {
+            font-size: 24px;
+            letter-spacing: 3px;
+            color: #2c3e50;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <p>Hello,</p>
+    <p>You requested to reset your password for {appName}. Please use the following OTP code:</p>
+    <div class="otp-code">{otp}</div>
+    <p>This code is valid for {otpExpiryMinutes} minutes.</p>
+    <p>If you didn't request this, please ignore this email or contact support.</p>
+    <p>Best regards,<br>{appName} Team</p>
+    <p style="font-size: 12px; color: #777;">© {currentYear} {appName}. All rights reserved.</p>
+</body>
+</html>
+`;
+
+export const PASSWORD_RESET_CONFIRMATION_TEMPLATE = `
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .button {
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <p>Hello,</p>
+    <p>Your password for {appName} has been successfully reset.</p>
+    <p>If you did not perform this action, please contact our support team immediately.</p>
+    <a href="{appUrl}" class="button">Login to {appName}</a>
+    <p>Best regards,<br>{appName} Team</p>
+    <p style="font-size: 12px; color: #777;">© {currentYear} {appName}. All rights reserved.</p>
+</body>
+</html>
+`;

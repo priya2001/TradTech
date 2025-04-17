@@ -8,7 +8,7 @@ import {
   orderJuice,
   getMyOrders,
   protect,
-  restrictTo
+  restrictTo,
 } from '../controllers/customerController.js';
 
 const router = express.Router();
@@ -30,7 +30,7 @@ router.post('/order-juice', orderJuice);
 router.get('/my-orders', getMyOrders);
 
 // Admin-only routes
-router.use(restrictTo('admin'));
+// router.use(restrictTo('admin'));
 
 // Additional admin routes can be added here
 // Example: router.get('/', getAllCustomers);

@@ -8,7 +8,7 @@ import sendEmail from '../utils/email.js';
 import { SHOPKEEPER_APPROVAL_EMAIL_TEMPLATE, 
   SHOPKEEPER_REJECTION_EMAIL_TEMPLATE
 } from '../utils/emailTemplates.js';
-import Customer from '../models/Customer.js';
+import Customer from '../models/customer.js';
 
 // Helper function to sign JWT token
 const signToken = id => {

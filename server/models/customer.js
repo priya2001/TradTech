@@ -21,10 +21,16 @@ const customerSchema = new mongoose.Schema({
     minlength: 8,
     select: false
   },
+  resetPasswordOTP: {
+    type: String
+  },
+  resetPasswordOTPExpiry: {
+    type: Date
+  },
   role: {
     type: String,
-    enum: ['user', 'admin', 'customer'], // Only allow these values
-    default: 'user' // Default role for new customers
+    enum: ['shopkeeper', 'admin', 'customer'], // Only allow these values
+    default: 'customer' // Default role for new customers
   },
   profilePic: {
     type: String,

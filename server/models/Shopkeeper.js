@@ -29,6 +29,12 @@ const shopkeeperSchema = new mongoose.Schema({
         minlength: [8, 'Password must be at least 8 characters'],
         select: false
     },
+    resetPasswordOTP: {
+        type: String
+      },
+      resetPasswordOTPExpiry: {
+        type: Date
+      },
     profilePic: {
         type: String,
         default: 'default.jpg'
@@ -74,8 +80,8 @@ const shopkeeperSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['user', 'admin', 'customer'], // Only allow these values
-        default: 'customer' // Default role for new customers
+        enum: ['shopkeeper', 'admin', 'customer'], // Only allow these values
+        default: 'shopkeeper' // Default role for new customers
       }
 });
 

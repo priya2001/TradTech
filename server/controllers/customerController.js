@@ -1,4 +1,4 @@
-import Customer from '../models/Customer.js';
+import Customer from '../models/customer.js';
 import Order from '../models/Order.js';
 import AppError from '../utils/appError.js';
 import catchAsync from '../utils/catchAsync.js';
