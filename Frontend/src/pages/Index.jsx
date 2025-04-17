@@ -51,7 +51,7 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <h1 className="text-3xl font-bold text-center flex items-center justify-center gap-2">
             <SolarPanel className="inline-block text-solar-light" />
-            <span className="text-solar-light">Solar</span>Juice
+            <span className="text-solar-light">Tradi</span>Tech
           </h1>
           <p className="text-center mt-2 max-w-md mx-auto">
             The eco-friendly way to enjoy fresh sugarcane juice powered by solar

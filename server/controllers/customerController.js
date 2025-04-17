@@ -42,7 +42,9 @@ const createSendToken = (customer, statusCode, res) => {
     status: 'success',
     token,
     data: {
-      customer
+      customer: {
+        data:customer,
+      }
     }
   });
 };

@@ -28,7 +28,9 @@ const createSendToken = (admin, statusCode, res) => {
     status: 'success',
     token,
     data: {
-      admin
+      admin: {
+        data:admin
+      }
     }
   });
 };

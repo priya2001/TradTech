@@ -38,6 +38,8 @@ const Customer = () => {
       setUserLocation({ lat: 28.6139, lng: 77.209 });
     }
   }, []);
+  console.log("customer page ");
+  console.log(currentUser);
 
   if (!currentUser || currentUser.role !== "customer") {
     return null;
@@ -48,7 +50,7 @@ const Customer = () => {
       <Header />
 
       <main className="flex-1 container mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold mb-6">Welcome, {currentUser.name}</h1>
+        <h1 className="text-2xl font-bold mb-6">Welcome, {currentUser.data.customer.data.name}</h1>
 
         <div className="grid md:grid-cols-2 gap-6">
           <MapView showOrderButton={false} />
@@ -58,7 +60,7 @@ const Customer = () => {
 
       <footer className="bg-white py-4 border-t">
         <div className="container mx-auto px-4 text-center text-sm text-gray-600">
-          &copy; {new Date().getFullYear()} SolarJuice. All rights reserved.
+          &copy; {new Date().getFullYear()} TradiTech. All rights reserved.
         </div>
       </footer>
     </div>
