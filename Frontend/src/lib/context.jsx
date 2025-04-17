@@ -143,11 +143,11 @@ export const AppProvider = ({ children }) => {
   const [userLocation, setUserLocation] = useState(null);
   const [selectedShop, setSelectedShop] = useState(null);
 
-  const SHOPKEEPER_API_BASE = "http://localhost:3000/api"; // update this if needed
+  const API_BASE = "http://localhost:3000/api"; // update this if needed
 
   const signupShopkeeperAPI = async (payload) => {
     try {
-      const res = await fetch(`${SHOPKEEPER_API_BASE}/shopkeepers/signup`, {
+      const res = await fetch(`${API_BASE}/shopkeepers/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -167,9 +167,31 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const signupCustomerAPI = async (payload) => {
+  try {
+    const res = await fetch(`${API_BASE}/customers/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    // console.log(data);
+    if (res.ok && data) {
+      return data; // ✅ Return full data if signup is successful
+    } else {
+      console.error("Signup failed:", data);
+      return null; // ❌ Return null if signup failed
+    }
+  } catch (error) {
+    console.error("Error during signup:", error);
+    return null;
+  }
+  };
+
   const loginShopkeeperAPI = async (email, password) => {
     console.log(email, password);
-    const res = await fetch(`${SHOPKEEPER_API_BASE}/shopkeepers/login`, {
+    const res = await fetch(`${API_BASE}/shopkeepers/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -177,6 +199,29 @@ export const AppProvider = ({ children }) => {
     if (!res.ok) throw new Error("Login failed");
     return res.json();
   };
+
+  const loginCustomerAPI = async (email, password) => {
+    console.log(email, password);
+    const res = await fetch(`${API_BASE}/customers/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!res.ok) throw new Error("Login failed");
+    return res.json();
+  };
+  const loginAdminAPI = async (email, password) => {
+    console.log(email, password);
+    const res = await fetch(`${API_BASE}/admin/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!res.ok) throw new Error("Login failed");
+    return res.json();
+  };
+
+  
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -226,16 +271,44 @@ export const AppProvider = ({ children }) => {
         console.error("Shopkeeper Login Error:", err);
         return false;
       }
-    } else {
-      // Customer or Admin Login with mock
-      const user = users.find(
-        (user) => user.email === email && user.role === role
-      );
-      if (user) {
+    }else if (role === "customer") {
+      // console.log(email);
+      try {
+        const data = await loginCustomerAPI(email, password);
+        const user = {
+          role: "customer",
+          data: data.data,
+        };
+        console.log(data);
+        localStorage.setItem("token", data.token);
+
         setCurrentUser(user);
         return true;
+      } catch (err) {
+        console.error("customer Login Error:", err);
+        return false;
       }
-      return false;
+    } 
+    
+    
+    else if(role=='admin') {
+     
+       try {
+        const data = await loginAdminAPI(email, password);
+        const user = {
+          role: "admin",
+          data: data.data,
+        };
+        console.log(data);
+        localStorage.setItem("token", data.token);
+
+        setCurrentUser(user);
+        return true;
+      } catch (err) {
+        console.error("Admin Login Error:", err);
+        return false;
+      }
+    
     }
   };
 
@@ -252,8 +325,14 @@ export const AppProvider = ({ children }) => {
 
       const user = {
         role: data.user.role,
-        data: { shopkeeper: { data: data.user } },
+        data: {
+          [data.user.role]: {
+            data: data.user,
+          },
+        },
       };
+
+
       console.log(user);
       setCurrentUser(user);
       return { valid: true, data };
@@ -285,10 +364,10 @@ export const AppProvider = ({ children }) => {
 
   const shopkeepersignup = async (payload) => {
     try {
-      console.log(payload);
+      // console.log(payload);
       const data = await signupShopkeeperAPI(payload);
-      console.log(2);
-      console.log(data);
+      // console.log(2);
+      // console.log(data);
       if (data.status === "success") {
         const newUser = {
           id: data.data._id,
@@ -303,6 +382,29 @@ export const AppProvider = ({ children }) => {
       }
     } catch (err) {
       console.error("Shopkeeper Signup Error:", err);
+      return false;
+    }
+  };
+
+  const customerSignup = async (payload) => {
+    try {
+      console.log(payload);
+      const data = await signupCustomerAPI(payload);
+      console.log(2);
+      console.log(data);
+      if (data.status === "success") {
+        const newUser = {
+          data: data,
+          role: "customer",
+        };
+
+
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      console.error("Customer Signup Error:", err);
       return false;
     }
   };
@@ -428,6 +530,7 @@ export const AppProvider = ({ children }) => {
         getShopById,
         getMachineByShopId,
         verifyToken,
+        customerSignup
       }}
     >
       {children}

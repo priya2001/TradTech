@@ -25,7 +25,9 @@ const createSendToken = (shopkeeper, statusCode, res) => {
         status: 'success',
         token,
         data: {
-            shopkeeper
+            shopkeeper: {
+                data:shopkeeper
+            }
         }
     });
 };
@@ -113,7 +115,7 @@ export const login = catchAsync(async (req, res, next) => {
            
             return next(new AppError('Incorrect email or password', 401));
         }
-
+        
         // 3) If everything ok, send token to client
         createSendToken(shopkeeper, 200, res);
     } catch (error) {

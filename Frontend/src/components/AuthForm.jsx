@@ -19,7 +19,7 @@ import { useAppContext } from "@/lib/context";
 ; // adjust import path
 
 const AuthForm = () => {
-  const { login, signup, shopkeepersignup ,verifyToken} = useAppContext();
+  const { login, signup, shopkeepersignup ,verifyToken , customerSignup} = useAppContext();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("login");
@@ -65,7 +65,6 @@ const AuthForm = () => {
       });
     }
   }, []);
-
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -165,7 +164,55 @@ const AuthForm = () => {
           variant: "destructive",
         });
       }
-    } else {
+    }
+
+    else if (signupRole === "customer") {
+      if (
+        !signupName||
+        !signupEmail ||
+        !mobileNumber ||
+        !signupEmail
+       
+      ) {
+        alert("Please fill all customer-specific fields.");
+        return;
+      }
+
+      const payload = {
+        name: signupName,
+        email: signupEmail,
+        password: signupPassword,
+        passwordConfirm: signupPasswordConfirm,
+        role: "customer",
+        mobileNumber:mobileNumber
+      };
+
+      try {
+        const success = await customerSignup(payload);
+        console.log(success);
+        if (success) {
+          toast({
+            title: "Signup successful",
+            description: "Now Login.",
+          });
+          setActiveTab("login");
+        } else {
+          toast({
+            title: "Signup failed",
+            description: "Could not create account.",
+            variant: "destructive",
+          });
+        }
+      } catch (err) {
+        toast({
+          title: "Signup error",
+          description: "An error occurred during signup.",
+          variant: "destructive",
+        });
+      }
+    }
+    
+    else {
       try {
         const success = await signup(
           signupName,
@@ -289,18 +336,26 @@ const AuthForm = () => {
                   onChange={(e) => setSignupPassword(e.target.value)}
                   required
                 />
-              </div>
-              {signupRole === "shopkeeper" && (
-                <>
-                  <div>
-                    <Label>Confirm Password</Label>
+                <div>
+                  <Label>Confirm Password</Label>
+                  <Input
+                    type="password"
+                    value={signupPasswordConfirm}
+                    onChange={(e) => setSignupPasswordConfirm(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                    <Label>Mobile Number</Label>
                     <Input
-                      type="password"
-                      value={signupPasswordConfirm}
-                      onChange={(e) => setSignupPasswordConfirm(e.target.value)}
+                      value={mobileNumber}
+                      onChange={(e) => setMobileNumber(e.target.value)}
                       required
                     />
                   </div>
+              </div>
+              {signupRole === "shopkeeper" && (
+                <>
                   <div>
                     <Label>Shop Name</Label>
                     <Input
@@ -309,14 +364,7 @@ const AuthForm = () => {
                       required
                     />
                   </div>
-                  <div>
-                    <Label>Mobile Number</Label>
-                    <Input
-                      value={mobileNumber}
-                      onChange={(e) => setMobileNumber(e.target.value)}
-                      required
-                    />
-                  </div>
+                  
                   <div>
                     <Label>License Number</Label>
                     <Input
