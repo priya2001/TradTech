@@ -37,10 +37,10 @@ const Shopkeeper = () => {
   if (!currentUser || currentUser.role !== "shopkeeper") {
     return null;
   }
-console.log(currentUser)
+// console.log(currentUser)
   const userShop = currentUser.data.shopkeeper;
-
-  
+  console.log(currentUser);
+  console.log(userShop);
 
   const machine = userShop && machines.find((m) => m.shopId === '1');
 

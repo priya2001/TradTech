@@ -133,7 +133,6 @@ const AppContext = createContext({
   getMachineByShopId: () => undefined,
 });
 
-
 export const AppProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState(mockUsers);
@@ -144,10 +143,7 @@ export const AppProvider = ({ children }) => {
   const [userLocation, setUserLocation] = useState(null);
   const [selectedShop, setSelectedShop] = useState(null);
 
-
-
-const SHOPKEEPER_API_BASE = "http://localhost:3000/api"; // update this if needed
-
+  const SHOPKEEPER_API_BASE = "http://localhost:3000/api"; // update this if needed
 
   const signupShopkeeperAPI = async (payload) => {
     try {
@@ -158,7 +154,7 @@ const SHOPKEEPER_API_BASE = "http://localhost:3000/api"; // update this if neede
       });
 
       const data = await res.json();
-      console.log(data);
+      // console.log(data);
       if (res.ok && data) {
         return data; // ✅ Return full data if signup is successful
       } else {
@@ -171,19 +167,16 @@ const SHOPKEEPER_API_BASE = "http://localhost:3000/api"; // update this if neede
     }
   };
 
-
-  
-  
   const loginShopkeeperAPI = async (email, password) => {
     console.log(email, password);
-  const res = await fetch(`${SHOPKEEPER_API_BASE}/shopkeepers/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-  if (!res.ok) throw new Error("Login failed");
-  return res.json();
-};
+    const res = await fetch(`${SHOPKEEPER_API_BASE}/shopkeepers/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!res.ok) throw new Error("Login failed");
+    return res.json();
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -215,16 +208,18 @@ const SHOPKEEPER_API_BASE = "http://localhost:3000/api"; // update this if neede
       // console.log(email);
       try {
         const data = await loginShopkeeperAPI(email, password);
-        
+
         if (data.data.active === false) {
           alert("Approval pending ");
           return false;
-         } 
-        const user = {
-          role: 'shopkeeper',
-          data: data.data
-
         }
+        const user = {
+          role: "shopkeeper",
+          data: data.data,
+        };
+        console.log(data);
+        localStorage.setItem("token", data.token);
+
         setCurrentUser(user);
         return true;
       } catch (err) {
@@ -244,38 +239,57 @@ const SHOPKEEPER_API_BASE = "http://localhost:3000/api"; // update this if neede
     }
   };
 
+  const verifyToken = async (token) => {
+    try {
+      const res = await fetch("http://localhost:3000/api/auth/me", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      const user = {
+        role: data.user.role,
+        data: { shopkeeper: { data: data.user } },
+      };
+      console.log(user);
+      setCurrentUser(user);
+      return { valid: true, data };
+    } catch (err) {
+      console.error("Error verifying token:", err);
+      return { valid: false };
+    }
+  };
 
   const logout = () => {
+    localStorage.removeItem("token");
     setCurrentUser(null);
   };
 
- const signup = async (
-   name,
-   email,
-   password,
-   role
- )=>{
-     // Customer or Admin Signup with mock
-     if (users.some((user) => user.email === email)) return false;
+  const signup = async (name, email, password, role) => {
+    // Customer or Admin Signup with mock
+    if (users.some((user) => user.email === email)) return false;
 
-     const newUser = {
-       id: `user-${Date.now()}`,
-       name,
-       email,
-       role,
-     };
-     setUsers((prev) => [...prev, newUser]);
-     setCurrentUser(newUser);
-     return true;
-   
+    const newUser = {
+      id: `user-${Date.now()}`,
+      name,
+      email,
+      role,
+    };
+    setUsers((prev) => [...prev, newUser]);
+    setCurrentUser(newUser);
+    return true;
   };
-  
+
   const shopkeepersignup = async (payload) => {
     try {
+      console.log(payload);
       const data = await signupShopkeeperAPI(payload);
       console.log(2);
       console.log(data);
-      if (data.status==="success") {
+      if (data.status === "success") {
         const newUser = {
           id: data.data._id,
           name: data.data.name,
@@ -292,8 +306,6 @@ const SHOPKEEPER_API_BASE = "http://localhost:3000/api"; // update this if neede
       return false;
     }
   };
-
-
 
   const updateMachine = (machineId, updates) => {
     setMachines((prev) =>
@@ -415,6 +427,7 @@ const SHOPKEEPER_API_BASE = "http://localhost:3000/api"; // update this if neede
         setSelectedShop,
         getShopById,
         getMachineByShopId,
+        verifyToken,
       }}
     >
       {children}

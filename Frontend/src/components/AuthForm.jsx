@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -16,8 +16,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
 import { useAppContext } from "@/lib/context";
 
+; // adjust import path
+
 const AuthForm = () => {
-  const { login, signup, shopkeepersignup } = useAppContext();
+  const { login, signup, shopkeepersignup ,verifyToken} = useAppContext();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("login");
@@ -37,6 +39,33 @@ const AuthForm = () => {
   const [licenseNumber, setLicenseNumber] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
+
+
+  // const token = localStorage.getItem("token");
+  // console.log(token);
+
+
+  
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      verifyToken(token).then((res) => {
+        
+        if (!res.valid) {
+          localStorage.removeItem("token");
+          console.log("Invalid token removed");
+        } else {
+          console.log("Valid token for user:", res.data.user);
+          navigate(`/${res.data.user.role}`);
+
+          // You can redirect or set user state here
+        }
+        console.log(res);
+      });
+    }
+  }, []);
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -100,6 +129,7 @@ const AuthForm = () => {
         name: signupName,
         email: signupEmail,
         password: signupPassword,
+        passwordConfirm: signupPasswordConfirm,
         shopName,
         mobileNumber,
         licenseNumber,
@@ -109,6 +139,7 @@ const AuthForm = () => {
           },
           fullAddress: "Demo address",
         },
+        role: signupRole
       };
 
       try {
