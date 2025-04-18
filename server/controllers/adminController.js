@@ -159,7 +159,7 @@ export const rejectShopkeeper = catchAsync(async (req, res, next) => {
 // @route   GET /api/admin/shopkeepers
 // @access  Private/Admin
 export const getAllShopkeepers = catchAsync(async (req, res, next) => {
-  const shopkeepers = await Shopkeeper.find();
+  const shopkeepers = await Shopkeeper.find({ active: true }).select("+active");
 
   res.status(200).json({
     status: 'success',
