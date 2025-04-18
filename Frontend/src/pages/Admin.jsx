@@ -1,23 +1,29 @@
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "@/components/Header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Shop } from "@/components/Icons";
-import { useAppContext } from "@/lib/context";
 import { useToast } from "@/components/ui/use-toast";
+import { usePendingRegistrations } from "@/hooks/usePendingRegistrations";
+import { Button } from "@/components/ui/button";
+import { useAppContext } from "@/lib/context";
+import Header from "../components/Header";
 
 const Admin = () => {
   const navigate = useNavigate();
+  const { currentUser } = useAppContext();
   const { toast } = useToast();
+
   const {
-    currentUser,
-    registrations,
-    approveShopRegistration,
-    rejectShopRegistration,
-    users,
-  } = useAppContext();
+    pendingRegistrations,
+    loading,
+    error,
+    refetch,
+    approvedshopkeepers,
+    rejectShopkeeper,
+    approveShopkeeperById,
+ 
+  } = usePendingRegistrations();
+
+  const [activeTab, setActiveTab] = useState("total");
+  const [selectedShopkeeper, setSelectedShopkeeper] = useState(null);
 
   useEffect(() => {
     if (!currentUser) {
@@ -30,168 +36,181 @@ const Admin = () => {
   if (!currentUser || currentUser.role !== "admin") {
     return null;
   }
+  console.log(pendingRegistrations);
+  console.log(approvedshopkeepers)
 
-  const pendingRegistrations = registrations.filter(
-    (reg) => reg.status === "pending"
-  );
+  const approvedShopkeepers =
+   approvedshopkeepers?.data?.shopkeepers || [];
 
-  const handleApprove = (registrationId) => {
-    approveShopRegistration(registrationId);
+  const pendingShopkeepers =
+    pendingRegistrations?.data?.shopkeepers || [];
+
+  const currentList =
+    activeTab === "total" ? approvedShopkeepers : pendingShopkeepers;
+  console.log(currentList);
+
+  const handleApprove = async (id) => {
+    try {
+      await approveShopkeeperById(id);
+      toast({
+        title: "Approved",
+        description: "Shopkeeper approved successfully",
+      });
+      setSelectedShopkeeper(null);
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to approve shopkeeper",
+      });
+    }
+  };
+
+  const handleReject = async (id) => {
+    await rejectShopkeeper(id);
     toast({
-      title: "Registration approved",
-      description: "The shop registration has been approved",
+      title: "Rejected",
+      description: "Shopkeeper rejected successfully",
     });
+    setSelectedShopkeeper(null);
+    refetch(); // refresh data
   };
 
-  const handleReject = (registrationId) => {
-    rejectShopRegistration(registrationId);
-    toast({
-      title: "Registration rejected",
-      description: "The shop registration has been rejected",
-    });
-  };
-
-  const getShopkeeperName = (shopkeeperId) => {
-    const user = users.find((user) => user.id === shopkeeperId);
-    return user ? user.name : "Unknown";
-  };
+  if (loading) {
+    return <div className="p-10 text-center">Loading shopkeepers...</div>;
+  }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
+    <div>
+      <Header/>
+      <div className="flex h-screen font-sans bg-gray-50">
+        {/* Sidebar */}
 
-      <main className="flex-1 container mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
+        <div className="w-1/5 bg-white p-6 shadow-md">
+          <h2 className="text-xl font-semibold mb-6">Dashboard</h2>
+          <ul className="space-y-4">
+            <li
+              className={`cursor-pointer ${
+                activeTab === "total"
+                  ? "text-blue-600 font-semibold"
+                  : "text-gray-700"
+              }`}
+              onClick={() => setActiveTab("total")}
+            >
+              📋 Total Shopkeepers
+            </li>
+            <li
+              className={`cursor-pointer ${
+                activeTab === "pending"
+                  ? "text-blue-600 font-semibold"
+                  : "text-gray-700"
+              }`}
+              onClick={() => setActiveTab("pending")}
+            >
+              ⏳ Pending Approvals
+            </li>
+          </ul>
+        </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2">
-                <Shop className="h-5 w-5 text-primary" />
-                Pending Shop Registrations
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {pendingRegistrations.length > 0 ? (
-                <div className="space-y-4">
-                  {pendingRegistrations.map((registration) => (
-                    <div
-                      key={registration.id}
-                      className="p-4 border rounded-md"
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <div className="font-medium">
-                            {registration.shopName}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            by {getShopkeeperName(registration.shopkeeperId)}
-                          </div>
-                        </div>
-                        <Badge>pending</Badge>
-                      </div>
+        {/* Main */}
+        <div className="flex-1 p-8 overflow-y-auto">
+          <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
 
-                      <div className="text-sm mb-3">
-                        <div>
-                          <strong>Address:</strong> {registration.address}
-                        </div>
-                        <div>
-                          <strong>Location:</strong>{" "}
-                          {registration.location.lat.toFixed(4)},{" "}
-                          {registration.location.lng.toFixed(4)}
-                        </div>
-                        {registration.machineId && (
-                          <div>
-                            <strong>Machine ID:</strong>{" "}
-                            {registration.machineId}
-                          </div>
-                        )}
-                        <div>
-                          <strong>Submitted:</strong>{" "}
-                          {new Date(registration.timestamp).toLocaleString()}
-                        </div>
-                      </div>
+          {/* Stats */}
+          <div className="flex gap-4 mb-6">
+            <div className="bg-white p-4 rounded shadow w-48 text-center">
+              <h3 className="text-gray-600">Total Shopkeepers</h3>
+              <p className="text-2xl font-bold">{approvedShopkeepers.length}</p>
+            </div>
+            <div className="bg-white p-4 rounded shadow w-48 text-center">
+              <h3 className="text-gray-600">Pending</h3>
+              <p className="text-2xl font-bold">{pendingShopkeepers.length}</p>
+            </div>
+          </div>
 
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleApprove(registration.id)}
-                          className="flex-1"
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleReject(registration.id)}
-                          className="flex-1"
-                        >
-                          Reject
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+          {/* Shopkeeper List */}
+          <h2 className="text-xl font-semibold mb-4">
+            {activeTab === "total" ? "Total Shopkeepers" : "Pending Approvals"}
+          </h2>
+
+          {currentList.length === 0 ? (
+            <p className="text-gray-500">No data available.</p>
+          ) : (
+            <div className="space-y-3">
+              {currentList.map((shopkeeper) => (
+                <div
+                  key={shopkeeper._id}
+                  className="bg-white p-4 flex justify-between items-center rounded shadow hover:cursor-pointer"
+                  onClick={() => setSelectedShopkeeper(shopkeeper)}
+                >
+                  <div>
+                    <h3 className="font-medium">{shopkeeper.shopName}</h3>
+                    <p className="text-gray-600">{shopkeeper.email}</p>
+                  </div>
+                  {!shopkeeper.active && <Button>View</Button>}
                 </div>
-              ) : (
-                <div className="text-center py-10 text-gray-500">
-                  No pending registrations
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Modal */}
+        {selectedShopkeeper && (
+          <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-xl w-[400px] relative">
+              <button
+                className="absolute top-3 right-4 text-xl font-bold"
+                onClick={() => setSelectedShopkeeper(null)}
+              >
+                ×
+              </button>
+              <h2 className="text-xl font-bold mb-1">
+                {selectedShopkeeper.shopName}
+              </h2>
+              <p className="text-gray-800 mb-2">{selectedShopkeeper.email}</p>
+
+              <div className="space-y-2 text-sm text-gray-700">
+                <p>
+                  <span className="font-semibold">Name</span>{" "}
+                  {selectedShopkeeper.name}
+                </p>
+                <p>
+                  <span className="font-semibold">Email:</span>{" "}
+                  {selectedShopkeeper.email}
+                </p>
+                <p>
+                  <span className="font-semibold">License:</span>{" "}
+                  {selectedShopkeeper.licenseNumber}
+                </p>
+                <p>
+                  <span className="font-semibold">Mobile no:</span>{" "}
+                  {selectedShopkeeper.mobileNumber}
+                </p>
+                <p>
+                  <span className="font-semibold">address:</span>{" "}
+                  {selectedShopkeeper.address.location.coordinates}
+                </p>
+              </div>
+
+              {!selectedShopkeeper.active && (
+                <div className="flex justify-end gap-4 mt-6">
+                  <button
+                    onClick={() => handleApprove(selectedShopkeeper._id)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleReject(selectedShopkeeper._id)}
+                    className="bg-gray-200 px-4 py-2 rounded"
+                  >
+                    Reject
+                  </button>
                 </div>
               )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle>System Statistics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="p-4 bg-gray-50 rounded-md">
-                  <div className="text-sm text-gray-500">Total Users</div>
-                  <div className="text-2xl font-bold">{users.length}</div>
-                  <div className="text-xs text-gray-400 mt-1">
-                    {users.filter((u) => u.role === "customer").length}{" "}
-                    customers,{" "}
-                    {users.filter((u) => u.role === "shopkeeper").length}{" "}
-                    shopkeepers
-                  </div>
-                </div>
-
-                <div className="p-4 bg-gray-50 rounded-md">
-                  <div className="text-sm text-gray-500">
-                    Total Registrations
-                  </div>
-                  <div className="text-2xl font-bold">
-                    {registrations.length}
-                  </div>
-                  <div className="text-xs text-gray-400 mt-1">
-                    {
-                      registrations.filter((r) => r.status === "approved")
-                        .length
-                    }{" "}
-                    approved,
-                    {
-                      registrations.filter((r) => r.status === "rejected")
-                        .length
-                    }{" "}
-                    rejected,
-                    {
-                      registrations.filter((r) => r.status === "pending").length
-                    }{" "}
-                    pending
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-
-      <footer className="bg-white py-4 border-t">
-        <div className="container mx-auto px-4 text-center text-sm text-gray-600">
-          &copy; {new Date().getFullYear()} SolarJuice. All rights reserved.
-        </div>
-      </footer>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
