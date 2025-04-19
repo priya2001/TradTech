@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/lib/context";
+import { useState } from "react";
 
 const Header = () => {
-  const { currentUser, logout } = useAppContext();
+  const { currentUser, logout, verifyToken } = useAppContext();
+  const [role, setRole] = useState("");
+
 
   let dashboardLink = "/";
   if (currentUser?.role === "customer") {
@@ -13,6 +16,31 @@ const Header = () => {
   } else if (currentUser?.role === "admin") {
     dashboardLink = "/admin";
   }
+
+// useEffect(() => {
+//     const token = localStorage.getItem("token");
+//     if (token) {
+//       verifyToken(token).then((res) => {
+        
+//         if (!res.valid) {
+//           localStorage.removeItem("token");
+//           console.log("Invalid token removed");
+//         } else {
+//           console.log("Valid token for user:", res.data.user);
+          
+//           navigate(`/${res.data.user.role}`);
+//           setRole(res.data.user.role);
+//           // You can redirect or set user state here
+//         }
+//         console.log(res);
+//       });
+//     }
+// }, []);
+  
+  
+
+
+
   console.log(currentUser);
   return (
     <header className="bg-primary py-4 px-6 text-primary-foreground shadow-md">
