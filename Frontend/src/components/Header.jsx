@@ -13,14 +13,14 @@ const Header = () => {
   } else if (currentUser?.role === "admin") {
     dashboardLink = "/admin";
   }
-
+  console.log(currentUser);
   return (
     <header className="bg-primary py-4 px-6 text-primary-foreground shadow-md">
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <Link to="/" className="text-xl font-bold flex items-center">
-            <span className="text-solar-dark">Solar</span>
-            <span className="text-black">Juice</span>
+            <span className="text-solar-dark">Tradi</span>
+            <span className="text-black">Tech</span>
           </Link>
         </div>
 
