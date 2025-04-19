@@ -13,12 +13,12 @@ const MapView = ({
   nearestShops = [], 
   showOnlyNearest = false 
 }) => {
-  const { shops, selectedShop, setSelectedShop } = useAppContext();
+  const { shops, selectedShop, setSelectedShop ,setShops} = useAppContext();
   const [userLocation, setUserLocation] = useState(null);
   const { toast } = useToast();
   const [directions, setDirections] = useState(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  
+  // const [shops, setShops] = useState();
   const mapRef = useRef(null);
 
   const containerStyle = {

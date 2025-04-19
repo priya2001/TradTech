@@ -540,7 +540,8 @@ export const AppProvider = ({ children }) => {
         getShopById,
         getMachineByShopId,
         verifyToken,
-        customerSignup
+        customerSignup,
+        setShops
       }}
     >
       {children}

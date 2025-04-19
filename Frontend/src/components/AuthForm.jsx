@@ -8,6 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +22,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
 import { useAppContext } from "@/lib/context";
+import MapPicker from "./MapPicker";
+
+import { Badge } from "@/components/ui/badge"; // Optional: for address display
 
 ; // adjust import path
 
@@ -39,6 +49,7 @@ const AuthForm = () => {
   const [licenseNumber, setLicenseNumber] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
+  const [location, setLocation] = useState({});
 
 
   // const token = localStorage.getItem("token");
@@ -346,13 +357,13 @@ const AuthForm = () => {
                   />
                 </div>
                 <div>
-                    <Label>Mobile Number</Label>
-                    <Input
-                      value={mobileNumber}
-                      onChange={(e) => setMobileNumber(e.target.value)}
-                      required
-                    />
-                  </div>
+                  <Label>Mobile Number</Label>
+                  <Input
+                    value={mobileNumber}
+                    onChange={(e) => setMobileNumber(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
               {signupRole === "shopkeeper" && (
                 <>
@@ -364,7 +375,6 @@ const AuthForm = () => {
                       required
                     />
                   </div>
-                  
                   <div>
                     <Label>License Number</Label>
                     <Input
@@ -373,24 +383,66 @@ const AuthForm = () => {
                       required
                     />
                   </div>
-                  <div className="flex space-x-2">
-                    <div>
-                      <Label>Latitude</Label>
-                      <Input
-                        value={latitude}
-                        onChange={(e) => setLatitude(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label>Longitude</Label>
-                      <Input
-                        value={longitude}
-                        onChange={(e) => setLongitude(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
+                 
+
+
+<div className="space-y-4">
+  <Dialog
+    open={location.showMap}
+    onOpenChange={(val) =>
+      setLocation((prev) => ({ ...prev, showMap: val }))
+    }
+  >
+    <DialogTrigger asChild>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={(e) => {
+          e.preventDefault();
+          setLocation((prev) => ({ ...prev, showMap: true }));
+        }}
+      >
+        📍 Select Location from Map
+      </Button>
+    </DialogTrigger>
+
+    <DialogContent className="max-w-3xl">
+      <DialogHeader>
+        <DialogTitle>Select Location</DialogTitle>
+      </DialogHeader>
+      <div className="h-[400px]">
+        <MapPicker
+          onLocationSelect={(loc) => {
+            setLocation({
+              lat: loc.lat,
+              lng: loc.lng,
+              address: loc.address,
+              showMap: false,
+            });
+            setLatitude(loc.lat);
+            setLongitude(loc.lng);
+          }}
+        />
+      </div>
+    </DialogContent>
+  </Dialog>
+
+  {location.address && (
+    <div className="space-y-1 bg-gray-50 rounded-xl p-4 border text-sm shadow-sm">
+      <p>
+        <strong>Selected Address:</strong>{" "}
+        <Badge variant="secondary">{location.address}</Badge>
+      </p>
+      <p>
+        <strong>Latitude:</strong> <span>{location.lat}</span>
+      </p>
+      <p>
+        <strong>Longitude:</strong> <span>{location.lng}</span>
+      </p>
+    </div>
+  )}
+</div>
+
                 </>
               )}
               <div>
