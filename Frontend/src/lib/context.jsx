@@ -221,6 +221,8 @@ export const AppProvider = ({ children }) => {
     if (!res.ok) throw new Error("Login failed");
     return res.json();
   };
+
+
   const loginAdminAPI = async (email, password) => {
     console.log(email, password);
     const res = await fetch(`${API_BASE}/admin/login`, {
@@ -455,19 +457,19 @@ export const AppProvider = ({ children }) => {
 
   
 
-  const createOrder = (customerId, shopId, glassCount) => {
-    const orderId = `order-${Date.now()}`;
-    const newOrder = {
-      id: orderId,
-      customerId,
-      shopId,
-      glassCount,
-      status: "pending",
-      timestamp: Date.now(),
-    };
-    setOrders((prev) => [...prev, newOrder]);
-    return orderId;
-  };
+  // const createOrder = (customerId, shopId, glassCount) => {
+  //   const orderId = `order-${Date.now()}`;
+  //   const newOrder = {
+  //     id: orderId,
+  //     customerId,
+  //     shopId,
+  //     glassCount,
+  //     status: "pending",
+  //     timestamp: Date.now(),
+  //   };
+  //   setOrders((prev) => [...prev, newOrder]);
+  //   return orderId;
+  // };
 
   const updateOrderStatus = (orderId, status) => {
     setOrders((prev) =>
@@ -557,7 +559,7 @@ export const AppProvider = ({ children }) => {
         signup,
         shopkeepersignup,
         updateMachine,
-        createOrder,
+        // createOrder,
         updateOrderStatus,
         submitShopRegistration,
         approveShopRegistration,

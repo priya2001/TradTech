@@ -23,6 +23,7 @@ const orderSchema = new mongoose.Schema({
   },
   pricePerGlass: { // Price based on glassSize (set by shop)
     type: Number,
+    default:40,
     required: true
   },
   totalAmount: { // Auto-calculated (pricePerGlass × quantity)

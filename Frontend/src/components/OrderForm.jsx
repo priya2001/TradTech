@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
@@ -10,23 +15,25 @@ import {
   hasEnoughBattery,
 } from "@/lib/calculations";
 import { useToast } from "@/components/ui/use-toast";
+import axios from "axios";
 
 const OrderForm = () => {
-  const { currentUser, selectedShop, createOrder, getMachineByShopId } =
-    useAppContext();
+  const { currentUser, selectedShop ,setSelectedShop} = useAppContext();
   const { toast } = useToast();
+
   const [glassCount, setGlassCount] = useState(1);
+  const [glassSize, setGlassSize] = useState(250);
+  const [paymentMethod, setPaymentMethod] = useState("cash");
   const [isOrdering, setIsOrdering] = useState(false);
 
-  const machine = selectedShop
-    ? getMachineByShopId(selectedShop.id)
-    : undefined;
+  const machine = selectedShop ? selectedShop.machine : undefined;
+
   const sugarcanesNeeded = calculateSugarcanesNeeded(glassCount);
   const hasEnoughBatteryForOrder = machine
     ? hasEnoughBattery(glassCount, machine.batteryPercentage)
     : true;
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     if (!currentUser || !selectedShop) {
       toast({
         title: "Cannot place order",
@@ -48,18 +55,36 @@ const OrderForm = () => {
 
     setIsOrdering(true);
 
-    setTimeout(() => {
-      const orderId = createOrder(currentUser.id, selectedShop.id, glassCount);
+    try {
+  const res = await axios.post(
+    "http://localhost:3000/api/customers/order-juice",
+    {
+      shopId: selectedShop.id,
+      glassSize,
+      quantity: glassCount,
+      paymentMethod,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+      setSelectedShop(null);
+  toast({
+    title: "Order placed!",
+    description: `Your order for ${glassCount} glass${glassCount > 1 ? "es" : ""} has been placed`,
+  });
 
-      toast({
-        title: "Order placed!",
-        description: `Your order for ${glassCount} glass${
-          glassCount > 1 ? "es" : ""
-        } has been placed`,
-      });
-
-      setIsOrdering(false);
-    }, 1500);
+} catch (error) {
+  console.error("Order failed:", error.response?.data || error.message);
+  toast({
+    title: "Order failed",
+    description: error.response?.data?.message || "Something went wrong",
+    variant: "destructive",
+  });
+}
+ 
   };
 
   return (
@@ -80,6 +105,23 @@ const OrderForm = () => {
             </div>
 
             <div className="space-y-4">
+              {/* Glass size */}
+              <div className="space-y-2">
+                <Label htmlFor="glass-size">Glass Size (ml)</Label>
+                <div className="flex gap-2">
+                  {[250, 500].map((size) => (
+                    <Button
+                      key={size}
+                      variant={glassSize === size ? "default" : "outline"}
+                      onClick={() => setGlassSize(size)}
+                    >
+                      {size} ml
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Glass quantity */}
               <div className="space-y-2">
                 <Label htmlFor="glass-count">Number of Glasses</Label>
                 <div className="flex gap-2">
@@ -112,6 +154,7 @@ const OrderForm = () => {
                 </div>
               </div>
 
+              {/* Sugarcane info */}
               <div className="bg-gray-50 p-3 rounded-md">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-1 text-sm font-medium">
@@ -129,6 +172,23 @@ const OrderForm = () => {
                 )}
               </div>
 
+              {/* Payment method */}
+              <div className="space-y-2">
+                <Label>Payment Method</Label>
+                <div className="flex gap-2">
+                  {["cash", "card", "online"].map((method) => (
+                    <Button
+                      key={method}
+                      variant={paymentMethod === method ? "default" : "outline"}
+                      onClick={() => setPaymentMethod(method)}
+                    >
+                      {method}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Submit button */}
               <Button
                 className="w-full"
                 onClick={handleOrder}
