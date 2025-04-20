@@ -25,7 +25,8 @@ export const getShopLocations = catchAsync(async (req, res, next) => {
     },
     location: {
       type: shop.address.location.type,
-      coordinates: shop.address.location.coordinates
+      coordinates: shop.address.location.coordinates,
+      address: shop.address.location.address,
     }
   }));
 
@@ -97,7 +98,8 @@ export const getShopDetails = catchAsync(async (req, res, next) => {
         },
         location: {
           type: shop.address.location.type,
-          coordinates: shop.address.location.coordinates
+          coordinates: shop.address.location.coordinates,
+          address:shop.address.location.address,
         },
         createdAt: shop.createdAt
       }

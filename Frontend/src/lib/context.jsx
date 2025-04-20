@@ -152,10 +152,11 @@ export const AppProvider = ({ children }) => {
   const [registrations, setRegistrations] = useState(mockRegistrations);
   const [userLocation, setUserLocation] = useState(null);
   const [selectedShop, setSelectedShop] = useState(null);
-
+  const [locations, setLocations] = useState();
   const API_BASE = "http://localhost:3000/api"; // update this if needed
 
   const signupShopkeeperAPI = async (payload) => {
+    console.log(  payload);
     try {
       const res = await fetch(`${API_BASE}/shopkeepers/signup`, {
         method: "POST",
@@ -231,7 +232,23 @@ export const AppProvider = ({ children }) => {
     return res.json();
   };
 
-  
+   const fetchShopLocations = async () => {
+     try {
+       const response = await fetch(
+         "http://localhost:3000/api/shops/locations"
+       );
+
+       if (!response.ok) {
+         throw new Error(`API Error: ${response.status}`);
+       }
+
+       const data = await response.json();
+       return data; // Assuming it's an array of shop objects with lat/lng
+     } catch (error) {
+       console.error("Failed to fetch shop locations:", error.message);
+       return null;
+     }
+   };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -257,6 +274,15 @@ export const AppProvider = ({ children }) => {
 
     return () => clearInterval(interval);
   }, []);
+
+  const loadShops = async () => {
+    const data = await fetchShopLocations();
+    if (data) {
+      setLocations(data);
+    }
+  };
+
+  loadShops();
 
   const login = async (email, password, role) => {
     if (role === "shopkeeper") {
@@ -427,6 +453,8 @@ export const AppProvider = ({ children }) => {
     );
   };
 
+  
+
   const createOrder = (customerId, shopId, glassCount) => {
     const orderId = `order-${Date.now()}`;
     const newOrder = {
@@ -506,6 +534,7 @@ export const AppProvider = ({ children }) => {
     );
   };
 
+
   const getShopById = (shopId) => {
     return shops.find((shop) => shop.id === shopId);
   };
@@ -541,7 +570,9 @@ export const AppProvider = ({ children }) => {
         getMachineByShopId,
         verifyToken,
         customerSignup,
-        setShops
+        setShops,
+        loadShops,
+        locations,
       }}
     >
       {children}
