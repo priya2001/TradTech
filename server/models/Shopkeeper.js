@@ -54,12 +54,15 @@ const shopkeeperSchema = new mongoose.Schema({
           type: {
             type: String,
             default: 'Point',
-            enum: ['Point'],
-            required: true
+            // required: true
           },
           coordinates: {
             type: [Number],  // Must be an array of numbers
             required: [true, 'Coordinates are required']
+            },
+          address: {
+              type: String,
+              default: "Not available"
           }
         }
       },

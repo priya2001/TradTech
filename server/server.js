@@ -8,6 +8,7 @@ import customerRoutes from './routes/customerRoutes.js';
 import shopkeeperRoutes from './routes/shopkeeperRoutes.js';
 import adminRouter from './routes/adminRoutes.js';
 import authRoute from './routes/authRoute.js'
+import shopRouters from './routes/shopRoutes.js';
 
 
 
@@ -36,6 +37,8 @@ app.use('/api/customers', customerRoutes);
 app.use('/api/shopkeepers', shopkeeperRoutes);
 app.use('/api/admin', adminRouter);
 app.use("/api/auth", authRoute);
+app.use("/api/shops", shopRouters);
+
 
 
 // port

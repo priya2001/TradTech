@@ -8,6 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,11 +22,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
 import { useAppContext } from "@/lib/context";
+import MapPicker from "./MapPicker";
 
-; // adjust import path
+import { Badge } from "@/components/ui/badge"; // Optional: for address display // adjust import path
 
 const AuthForm = () => {
-  const { login, signup, shopkeepersignup ,verifyToken , customerSignup} = useAppContext();
+  const { login, signup, shopkeepersignup, verifyToken, customerSignup } =
+    useAppContext();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("login");
@@ -39,19 +48,16 @@ const AuthForm = () => {
   const [licenseNumber, setLicenseNumber] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
-
+  const [location, setLocation] = useState({});
+  const [address, setAddress] = useState();
 
   // const token = localStorage.getItem("token");
   // console.log(token);
-
-
-  
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       verifyToken(token).then((res) => {
-        
         if (!res.valid) {
           localStorage.removeItem("token");
           console.log("Invalid token removed");
@@ -108,13 +114,7 @@ const AuthForm = () => {
     }
 
     if (signupRole === "shopkeeper") {
-      if (
-        !shopName ||
-        !mobileNumber ||
-        !licenseNumber ||
-        !longitude ||
-        !latitude
-      ) {
+      if (!shopName || !mobileNumber || !licenseNumber) {
         alert("Please fill all shopkeeper-specific fields.");
         return;
       }
@@ -134,13 +134,13 @@ const AuthForm = () => {
         licenseNumber,
         address: {
           location: {
-            coordinates: [parseFloat(longitude), parseFloat(latitude)],
+            address: address,
+            coordinates: [parseFloat(latitude), parseFloat(longitude)],
           },
-          fullAddress: "Demo address",
         },
-        role: signupRole
+        role: signupRole,
       };
-
+      console.log(payload);
       try {
         const success = await shopkeepersignup(payload);
         console.log(success);
@@ -164,16 +164,8 @@ const AuthForm = () => {
           variant: "destructive",
         });
       }
-    }
-
-    else if (signupRole === "customer") {
-      if (
-        !signupName||
-        !signupEmail ||
-        !mobileNumber ||
-        !signupEmail
-       
-      ) {
+    } else if (signupRole === "customer") {
+      if (!signupName || !signupEmail || !mobileNumber || !signupEmail) {
         alert("Please fill all customer-specific fields.");
         return;
       }
@@ -184,7 +176,7 @@ const AuthForm = () => {
         password: signupPassword,
         passwordConfirm: signupPasswordConfirm,
         role: "customer",
-        mobileNumber:mobileNumber
+        mobileNumber: mobileNumber,
       };
 
       try {
@@ -210,9 +202,7 @@ const AuthForm = () => {
           variant: "destructive",
         });
       }
-    }
-    
-    else {
+    } else {
       try {
         const success = await signup(
           signupName,
@@ -243,7 +233,6 @@ const AuthForm = () => {
       }
     }
   };
-
 
   return (
     <Card className="w-full max-w-md mx-auto shadow-lg">
@@ -346,13 +335,13 @@ const AuthForm = () => {
                   />
                 </div>
                 <div>
-                    <Label>Mobile Number</Label>
-                    <Input
-                      value={mobileNumber}
-                      onChange={(e) => setMobileNumber(e.target.value)}
-                      required
-                    />
-                  </div>
+                  <Label>Mobile Number</Label>
+                  <Input
+                    value={mobileNumber}
+                    onChange={(e) => setMobileNumber(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
               {signupRole === "shopkeeper" && (
                 <>
@@ -364,7 +353,6 @@ const AuthForm = () => {
                       required
                     />
                   </div>
-                  
                   <div>
                     <Label>License Number</Label>
                     <Input
@@ -373,23 +361,63 @@ const AuthForm = () => {
                       required
                     />
                   </div>
-                  <div className="flex space-x-2">
-                    <div>
-                      <Label>Latitude</Label>
-                      <Input
-                        value={latitude}
-                        onChange={(e) => setLatitude(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label>Longitude</Label>
-                      <Input
-                        value={longitude}
-                        onChange={(e) => setLongitude(e.target.value)}
-                        required
-                      />
-                    </div>
+
+                  <div className="space-y-4">
+                    <Dialog
+                      open={location.showMap}
+                      onOpenChange={(val) =>
+                        setLocation((prev) => ({ ...prev, showMap: val }))
+                      }
+                    >
+                      <DialogTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setLocation((prev) => ({ ...prev, showMap: true }));
+                          }}
+                        >
+                          📍 Select Location from Map
+                        </Button>
+                      </DialogTrigger>
+
+                      <DialogContent className="max-w-3xl">
+                        <DialogHeader>
+                          <DialogTitle>Select Location</DialogTitle>
+                        </DialogHeader>
+                        <div className="h-[400px]">
+                          <MapPicker
+                            onLocationSelect={(loc) => {
+                              setLocation({
+                                lat: loc.lat,
+                                lng: loc.lng,
+                                address: loc.address,
+                                showMap: false,
+                              });
+                              setLatitude(loc.lat);
+                              setLongitude(loc.lng);
+                              setAddress(loc.address);
+                            }}
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+
+                    {location.address && (
+                      <div className="space-y-1 bg-gray-50 rounded-xl p-4 border text-sm shadow-sm">
+                        <p>
+                          <strong>Selected Address:</strong>{" "}
+                          <Badge variant="secondary">{location.address}</Badge>
+                        </p>
+                        {/* <p>
+        <strong>Latitude:</strong> <span>{location.lat}</span>
+      </p>
+      <p>
+        <strong>Longitude:</strong> <span>{location.lng}</span>
+      </p> */}
+                      </div>
+                    )}
                   </div>
                 </>
               )}

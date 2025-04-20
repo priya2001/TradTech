@@ -34,20 +34,30 @@ const mockShops = [
     id: "1",
     name: "Green Juice Haven",
     ownerId: "2",
-    location: { lat: 28.6139, lng: 77.209 },
-    address: "123 Green St, Delhi",
+    location: { lat: 25.498944, lng: 81.863513 },
+    address: "Pitamber Nagar, Teliarganj, Prayagraj, Uttar Pradesh 211004",
     rating: 4.5,
     machineId: "1",
     isApproved: true,
   },
   {
     id: "2",
-    name: "Solar Sips",
+    name: "SweetStalk Juices",
     ownerId: "3",
-    location: { lat: 28.6229, lng: 77.208 },
-    address: "456 Solar Ave, Delhi",
+    location: { lat: 25.492967, lng: 81.860950 },
+    address: "Prayagraj - Pratapgarh Rd, Barrister Mullah Colony, MNNIT Allahabad Campus, Teliarganj, Prayagraj, Uttar Pradesh 211002",
     rating: 4.2,
     machineId: "2",
+    isApproved: true,
+  },
+  {
+    id: "3",
+    name: "Nature's Nectar",
+    ownerId: "4",
+    location: { lat: 25.495609, lng: 81.869915 },
+    address: "MLNR Rd, MNNIT Allahabad Campus, Teliarganj, Prayagraj, Uttar Pradesh 211002",
+    rating: 4.2,
+    machineId: "3",
     isApproved: true,
   },
 ];
@@ -142,10 +152,11 @@ export const AppProvider = ({ children }) => {
   const [registrations, setRegistrations] = useState(mockRegistrations);
   const [userLocation, setUserLocation] = useState(null);
   const [selectedShop, setSelectedShop] = useState(null);
-
+  const [locations, setLocations] = useState();
   const API_BASE = "http://localhost:3000/api"; // update this if needed
 
   const signupShopkeeperAPI = async (payload) => {
+    console.log(  payload);
     try {
       const res = await fetch(`${API_BASE}/shopkeepers/signup`, {
         method: "POST",
@@ -221,7 +232,23 @@ export const AppProvider = ({ children }) => {
     return res.json();
   };
 
-  
+   const fetchShopLocations = async () => {
+     try {
+       const response = await fetch(
+         "http://localhost:3000/api/shops/locations"
+       );
+
+       if (!response.ok) {
+         throw new Error(`API Error: ${response.status}`);
+       }
+
+       const data = await response.json();
+       return data; // Assuming it's an array of shop objects with lat/lng
+     } catch (error) {
+       console.error("Failed to fetch shop locations:", error.message);
+       return null;
+     }
+   };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -247,6 +274,15 @@ export const AppProvider = ({ children }) => {
 
     return () => clearInterval(interval);
   }, []);
+
+  const loadShops = async () => {
+    const data = await fetchShopLocations();
+    if (data) {
+      setLocations(data);
+    }
+  };
+
+  loadShops();
 
   const login = async (email, password, role) => {
     if (role === "shopkeeper") {
@@ -417,6 +453,8 @@ export const AppProvider = ({ children }) => {
     );
   };
 
+  
+
   const createOrder = (customerId, shopId, glassCount) => {
     const orderId = `order-${Date.now()}`;
     const newOrder = {
@@ -496,6 +534,7 @@ export const AppProvider = ({ children }) => {
     );
   };
 
+
   const getShopById = (shopId) => {
     return shops.find((shop) => shop.id === shopId);
   };
@@ -530,7 +569,10 @@ export const AppProvider = ({ children }) => {
         getShopById,
         getMachineByShopId,
         verifyToken,
-        customerSignup
+        customerSignup,
+        setShops,
+        loadShops,
+        locations,
       }}
     >
       {children}
