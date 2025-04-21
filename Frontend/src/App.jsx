@@ -11,6 +11,9 @@ import Shopkeeper from "./pages/Shopkeeper";
 import Admin from "./pages/Admin";
 import Machine from "./pages/Machine";
 import NotFound from "./pages/NotFound";
+import EditProfile from './pages/EditProfile';
+import ChangePassword from "./pages/ChangePassword";
+
 
 const queryClient = new QueryClient();
 
@@ -27,7 +30,11 @@ const App = () => (
             <Route path="/shopkeeper" element={<Shopkeeper />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/machine/:shopId" element={<Machine />} />
+            <Route path="/profile/edit" element={<EditProfile />} />
+            <Route path="/profile/change-password" element={<ChangePassword />} />
             <Route path="*" element={<NotFound />} />
+            
+
           </Routes>
         </BrowserRouter>
       </AppProvider>

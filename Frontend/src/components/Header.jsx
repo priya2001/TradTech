@@ -2,6 +2,7 @@ import defaultImg from '../assets/default.webp';
 import adminImg from '../assets/admin.webp';
 import customerImg from '../assets/customer.webp';
 import shopkeeperImg from '../assets/shopkeeper.webp';
+// import EditProfile from '../pages/EditProfile';
 
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -67,11 +68,7 @@ const Header = () => {
                   />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="bg-white text-black rounded shadow-lg w-52 py-1">
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile" className="block px-3 py-2 hover:bg-gray-100">
-                      Open Profile
-                    </Link>
-                  </DropdownMenuItem>
+                  
                   <DropdownMenuItem asChild>
                     <Link to="/profile/edit" className="block px-3 py-2 hover:bg-gray-100">
                       Edit Profile
@@ -83,11 +80,7 @@ const Header = () => {
                     </Link>
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem asChild>
-                    <Link to={dashboardLink} className="block px-3 py-2 hover:bg-gray-100">
-                      Dashboard
-                    </Link>
-                  </DropdownMenuItem>
+                  
 
                   <DropdownMenuSeparator className="my-1" />
 

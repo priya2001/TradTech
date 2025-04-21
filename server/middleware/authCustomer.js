@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import Customer from '../models/Customer.js';
+
 
 export const protectCustomer = async (req, res, next) => {
     console.log("Inside customer middleware");
