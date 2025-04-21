@@ -1,7 +1,7 @@
-import defaultImg from '../assets/default.webp';
-import adminImg from '../assets/admin.webp';
-import customerImg from '../assets/customer.webp';
-import shopkeeperImg from '../assets/shopkeeper.webp';
+import defaultImg from "../assets/default.webp";
+import adminImg from "../assets/admin.webp";
+import customerImg from "../assets/customer.webp";
+import shopkeeperImg from "../assets/shopkeeper.webp";
 // import EditProfile from '../pages/EditProfile';
 
 import { Link } from "react-router-dom";
@@ -31,7 +31,6 @@ const Header = () => {
         return defaultImg;
     }
   };
-  
 
   let dashboardLink = "/";
   if (currentUser?.role === "customer") dashboardLink = "/customer";
@@ -39,24 +38,26 @@ const Header = () => {
   else if (currentUser?.role === "admin") dashboardLink = "/admin";
 
   return (
-    <header className="bg-[#1e1e1e] text-white py-4 shadow-md">
-      <div className="w-full px-4 flex items-center justify-between">
+    <header className="bg-[#1e1e1e] text-white py-5 shadow-md">
+      <div className="w-full px-6 flex items-center justify-between">
         {/* Left side logo/name */}
         <div className="flex items-center space-x-2">
-          <span className="text-lg font-semibold tracking-tight">
-            <span className="text-yellow-400 font-bold">Tradi</span>
-            <span className="text-white font-semibold ml-[-1px]">Tech</span>
+          <span className="text-3xl font-bold tracking-tight">
+            <span className="text-yellow-400">Tradi</span>
+            <span className="text-white ml-[-1px]">Tech</span>
           </span>
         </div>
 
         {/* Right side actions */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-6">
           {currentUser ? (
             <>
-            <span className="text-base hidden sm:block font-medium text-gray-300">
-  {currentUser.name} <span className="text-yellow-400 font-semibold capitalize">{currentUser.role}</span>
-</span>
-
+              <span className="text-xl hidden sm:block font-semibold text-gray-300">
+                {currentUser.name}{" "}
+                <span className="text-yellow-400 font-bold capitalize">
+                  {currentUser.role}
+                </span>
+              </span>
 
               {/* Dropdown on Profile Image */}
               <DropdownMenu>
@@ -64,40 +65,53 @@ const Header = () => {
                   <img
                     src={getProfileImage()}
                     alt="Profile"
-                    className="w-10 h-10 rounded-full border border-white object-cover cursor-pointer"
+                    className="w-12 h-12 rounded-full border-2 border-white object-cover cursor-pointer"
                   />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-white text-black rounded shadow-lg w-52 py-1">
-                  
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile/edit" className="block px-3 py-2 hover:bg-gray-100">
-                      Edit Profile
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile/change-password" className="block px-3 py-2 hover:bg-gray-100">
-                      Change Password
-                    </Link>
-                  </DropdownMenuItem>
+                <DropdownMenuContent
+  align="end"
+  className="bg-white text-black rounded-2xl shadow-2xl w-72 py-3 text-xl"
+>
+  <DropdownMenuItem asChild>
+    <Link
+      to="/profile/edit"
+      className="block px-6 py-4 hover:bg-gray-100 font-semibold text-xl"
+    >
+      ✏️ Edit Profile
+    </Link>
+  </DropdownMenuItem>
 
-                  
+  <DropdownMenuItem asChild>
+    <Link
+      to="/profile/change-password"
+      className="block px-6 py-4 hover:bg-gray-100 font-semibold text-xl"
+    >
+      🔒 Change Password
+    </Link>
+  </DropdownMenuItem>
 
-                  <DropdownMenuSeparator className="my-1" />
+  <DropdownMenuSeparator className="my-2" />
 
-                  <DropdownMenuItem asChild>
-                    <button
-                      onClick={logout}
-                      className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-100"
-                    >
-                      Logout
-                    </button>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
+  <DropdownMenuItem asChild>
+    <button
+      onClick={logout}
+      className="w-full text-left px-6 py-4 text-red-600 hover:bg-red-100 font-bold text-xl"
+    >
+      🚪 Logout
+    </button>
+  </DropdownMenuItem>
+</DropdownMenuContent>
+
               </DropdownMenu>
             </>
           ) : (
             <Link to="/">
-              <Button variant="outline">Login</Button>
+              <Button
+                variant="outline"
+                className="text-xl px-5 py-2 font-semibold"
+              >
+                Login
+              </Button>
             </Link>
           )}
         </div>
