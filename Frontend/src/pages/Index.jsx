@@ -45,15 +45,15 @@ const Landing = () => {
   }, [shops, userLocation]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-white">
       {/* Header */}
-      <header className="bg-primary py-6 text-primary-foreground">
+      <header className="py-8 text-primary-foreground">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold text-center flex items-center justify-center gap-2">
+          <h1 className="text-4xl font-bold text-center flex items-center justify-center gap-2 text-black">
             <SolarPanel className="inline-block text-solar-light" />
             <span className="text-solar-light">Tradi</span>Tech
           </h1>
-          <p className="text-center mt-2 max-w-md mx-auto">
+          <p className="text-lg text-center mt-4 max-w-md mx-auto text-black">
             The eco-friendly way to enjoy fresh sugarcane juice powered by solar
             energy.
           </p>
@@ -70,9 +70,9 @@ const Landing = () => {
 
           {/* Right: Login & Register */}
           <div className="flex flex-col items-center justify-center">
-            <Card className="w-full max-w-md shadow-lg">
-              <CardContent className="p-6">
-                <h2 className="text-2xl font-bold text-center mb-4">
+            <Card className="w-full max-w-lg shadow-lg bg-white rounded-xl transform transition-all duration-300 hover:scale-105">
+              <CardContent className="p-8">
+                <h2 className="text-3xl font-bold text-center mb-6">
                   Login / Register
                 </h2>
                 <AuthForm />
@@ -84,10 +84,10 @@ const Landing = () => {
         {/* Next Nearest Shop Section */}
         {nearestShop && (
           <div className="mt-12">
-            <h3 className="text-xl font-semibold text-center">
+            <h3 className="text-xl font-semibold text-center text-black">
               Next Nearest Shop
             </h3>
-            <Card className="mt-4 p-4 mx-auto max-w-lg">
+            <Card className="mt-4 p-4 mx-auto max-w-lg bg-white rounded-xl shadow-md">
               <CardContent className="flex justify-between items-center">
                 <div>
                   <h4 className="font-bold">{nearestShop.name}</h4>
