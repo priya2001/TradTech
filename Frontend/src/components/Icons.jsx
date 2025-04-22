@@ -1,19 +1,16 @@
-// Icons.jsx
-
-import React from "react";
-
 // Battery icon
 export const Battery = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    width="32"
+    height="32"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="2.5"
     strokeLinecap="round"
     strokeLinejoin="round"
+    className={`text-inherit ${props.className ?? ""}`}
     {...props}
   >
     <rect x="2" y="7" width="16" height="10" rx="2" ry="2" />
@@ -28,14 +25,15 @@ export const Battery = (props) => (
 export const Lightbulb = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    width="32"
+    height="32"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="2.5"
     strokeLinecap="round"
     strokeLinejoin="round"
+    className={`text-inherit ${props.className ?? ""}`}
     {...props}
   >
     <path d="M9 18h6" />
@@ -52,14 +50,15 @@ export const Lightbulb = (props) => (
 export const Fan = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    width="32"
+    height="32"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="2.5"
     strokeLinecap="round"
     strokeLinejoin="round"
+    className={`text-inherit ${props.className ?? ""}`}
     {...props}
   >
     <path d="M12 2a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1h-2z" />
@@ -76,14 +75,15 @@ export const Fan = (props) => (
 export const PaymentMachine = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    width="32"
+    height="32"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="2.5"
     strokeLinecap="round"
     strokeLinejoin="round"
+    className={`text-inherit ${props.className ?? ""}`}
     {...props}
   >
     <rect x="3" y="5" width="18" height="14" rx="2" />
@@ -98,14 +98,15 @@ export const PaymentMachine = (props) => (
 export const Sugarcane = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    width="32"
+    height="32"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="2.5"
     strokeLinecap="round"
     strokeLinejoin="round"
+    className={`text-inherit ${props.className ?? ""}`}
     {...props}
   >
     <path d="M4 14c0-3.314 2.686-6 6-6s6 2.686 6 6-2.686 6-6 6-6-2.686-6-6z" />
@@ -119,14 +120,15 @@ export const Sugarcane = (props) => (
 export const Glass = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    width="32"
+    height="32"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="2.5"
     strokeLinecap="round"
     strokeLinejoin="round"
+    className={`text-inherit ${props.className ?? ""}`}
     {...props}
   >
     <path d="M8 21h8" />
@@ -139,14 +141,15 @@ export const Glass = (props) => (
 export const SolarPanel = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    width="32"
+    height="32"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="2.5"
     strokeLinecap="round"
     strokeLinejoin="round"
+    className={`text-inherit ${props.className ?? ""}`}
     {...props}
   >
     <rect x="3" y="4" width="18" height="12" rx="2" />
@@ -163,14 +166,15 @@ export const SolarPanel = (props) => (
 export const Shop = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    width="32"
+    height="32"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="2.5"
     strokeLinecap="round"
     strokeLinejoin="round"
+    className={`text-inherit ${props.className ?? ""}`}
     {...props}
   >
     <path d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" />

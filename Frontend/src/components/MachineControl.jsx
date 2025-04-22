@@ -7,7 +7,7 @@ const MachineControl = ({ machine, updateMachine, onViewDetails }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <Card className="mb-6">
+    <Card className="mb-6 rounded-2xl shadow-lg">
       <CardHeader className="pb-2">
         <CardTitle className="flex justify-between items-center">
           <span>Machine Control</span>

@@ -20,7 +20,7 @@ import { useIsMobile } from "../hooks/use-mobile";
 
 const Machine = () => {
   const navigate = useNavigate();
-  const  shopId  = "1";
+  const shopId = "1";
   const { currentUser, getShopById, getMachineByShopId, updateMachine } =
     useAppContext();
   const isMobile = useIsMobile();
@@ -49,22 +49,6 @@ const Machine = () => {
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">Machine not found</h1>
-          <Button onClick={() => navigate("/shopkeeper")}>
-            Back to Dashboard
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (false) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">Unauthorized</h1>
-          <p className="mb-4">
-            You don't have permission to access this machine.
-          </p>
           <Button onClick={() => navigate("/shopkeeper")}>
             Back to Dashboard
           </Button>
@@ -106,7 +90,7 @@ const Machine = () => {
   return (
     <div className="min-h-screen bg-gray-100 py-4 px-2">
       <div className="machine-container max-w-5xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="bg-primary text-primary-foreground p-4">
+        <div className="bg-primary text-primary-foreground p-4 rounded-t-lg">
           <div className="flex justify-between items-center mb-2">
             <h1 className="text-lg font-bold">{shop.name} - Machine Control</h1>
             <Button
@@ -138,15 +122,12 @@ const Machine = () => {
                 !isMobile ? "md:w-1/3" : ""
               } my-6 flex justify-center`}
             >
-              <VerticalSlider
-                value={machine.speed}
-                onChange={handleSpeedChange}
-              />
+              <VerticalSlider value={machine.speed} onChange={handleSpeedChange} />
             </div>
 
             <div className={`${!isMobile ? "md:w-1/3" : ""}`}>
               <div className="grid grid-cols-2 gap-4 mt-4">
-                <Card>
+                <Card className="rounded-lg shadow-md">
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <SolarPanel className="h-5 w-5 text-solar" />
@@ -162,16 +143,14 @@ const Machine = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="rounded-lg shadow-md">
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <PaymentMachine className="h-5 w-5 text-primary" />
                       <span>Payment Machine</span>
                     </div>
                     <Button
-                      variant={
-                        machine.isPaymentMachineOn ? "default" : "outline"
-                      }
+                      variant={machine.isPaymentMachineOn ? "default" : "outline"}
                       size="sm"
                       onClick={togglePaymentMachine}
                     >
@@ -180,7 +159,7 @@ const Machine = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="rounded-lg shadow-md">
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Lightbulb className="h-5 w-5 text-solar" />
@@ -196,7 +175,7 @@ const Machine = () => {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="rounded-lg shadow-md">
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Fan
@@ -227,15 +206,13 @@ const Machine = () => {
           <div className="mt-6">
             <h3 className="font-medium mb-2">Machine Metrics</h3>
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-50 p-3 rounded-md">
+              <div className="bg-gray-50 p-3 rounded-lg shadow-md">
                 <div className="text-sm text-gray-500">Max Glasses</div>
                 <div className="text-xl font-bold">{maxGlasses}</div>
-                <div className="text-xs text-gray-400">
-                  With current battery
-                </div>
+                <div className="text-xs text-gray-400">With current battery</div>
               </div>
 
-              <div className="bg-gray-50 p-3 rounded-md">
+              <div className="bg-gray-50 p-3 rounded-lg shadow-md">
                 <div className="text-sm text-gray-500">Charging Time</div>
                 <div className="text-xl font-bold">
                   {machine.isCharging

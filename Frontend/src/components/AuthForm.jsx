@@ -24,7 +24,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAppContext } from "@/lib/context";
 import MapPicker from "./MapPicker";
 
-import { Badge } from "@/components/ui/badge"; // Optional: for address display // adjust import path
+import { Badge } from "@/components/ui/badge"; // Optional: for address display
 
 const AuthForm = () => {
   const { login, signup, shopkeepersignup, verifyToken, customerSignup } =
@@ -33,26 +33,26 @@ const AuthForm = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("login");
 
+  // Login State
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginRole, setLoginRole] = useState("customer");
 
+  // Signup State
   const [signupName, setSignupName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupPasswordConfirm, setSignupPasswordConfirm] = useState("");
   const [signupRole, setSignupRole] = useState("customer");
 
+  // Shopkeeper Details
   const [shopName, setShopName] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   const [licenseNumber, setLicenseNumber] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [location, setLocation] = useState({});
-  const [address, setAddress] = useState();
-
-  // const token = localStorage.getItem("token");
-  // console.log(token);
+  const [address, setAddress] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -64,8 +64,6 @@ const AuthForm = () => {
         } else {
           console.log("Valid token for user:", res.data.user);
           navigate(`/${res.data.user.role}`);
-
-          // You can redirect or set user state here
         }
         console.log(res);
       });
@@ -114,6 +112,7 @@ const AuthForm = () => {
     }
 
     if (signupRole === "shopkeeper") {
+      // Additional validation for shopkeeper role
       if (!shopName || !mobileNumber || !licenseNumber) {
         alert("Please fill all shopkeeper-specific fields.");
         return;
@@ -121,6 +120,11 @@ const AuthForm = () => {
 
       if (!/^\d{10}$/.test(mobileNumber)) {
         alert("Phone number must be exactly 10 digits.");
+        return;
+      }
+
+      if (!latitude || !longitude) {
+        alert("Please select a valid location.");
         return;
       }
 
@@ -143,7 +147,6 @@ const AuthForm = () => {
       console.log(payload);
       try {
         const success = await shopkeepersignup(payload);
-        console.log(success);
         if (success) {
           toast({
             title: "Signup successful",
@@ -181,7 +184,6 @@ const AuthForm = () => {
 
       try {
         const success = await customerSignup(payload);
-        console.log(success);
         if (success) {
           toast({
             title: "Signup successful",
@@ -238,206 +240,165 @@ const AuthForm = () => {
     <Card className="w-full max-w-md mx-auto shadow-lg">
       <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="login">Login</TabsTrigger>
-          <TabsTrigger value="signup">Signup</TabsTrigger>
+          <TabsTrigger value="login" className="text-2xl font-semibold">
+            Login
+          </TabsTrigger>
+          <TabsTrigger value="signup" className="text-2xl font-semibold">
+            Signup
+          </TabsTrigger>
         </TabsList>
 
+        {/* Login Tab Content */}
         <TabsContent value="login">
           <form onSubmit={handleLogin}>
             <CardHeader>
-              <CardTitle>Login</CardTitle>
-              <CardDescription>Enter your credentials</CardDescription>
+              <CardTitle className="text-3xl font-bold">Login</CardTitle>
+              <CardDescription className="text-xl">Enter your credentials</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Email</Label>
+                <Label className="text-xl">Email</Label>
                 <Input
                   type="email"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   required
+                  className="text-xl"
                 />
               </div>
               <div>
-                <Label>Password</Label>
+                <Label className="text-xl">Password</Label>
                 <Input
                   type="password"
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   required
+                  className="text-xl"
                 />
               </div>
               <div>
-                <Label>I am a:</Label>
+                <Label className="text-xl">I am a:</Label>
                 <RadioGroup value={loginRole} onValueChange={setLoginRole}>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="customer" id="login-customer" />
-                    <Label htmlFor="login-customer">Customer</Label>
+                    <Label htmlFor="login-customer" className="text-xl">
+                      Customer
+                    </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="shopkeeper" id="login-shopkeeper" />
-                    <Label htmlFor="login-shopkeeper">Shopkeeper</Label>
+                    <Label htmlFor="login-shopkeeper" className="text-xl">
+                      Shopkeeper
+                    </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="admin" id="login-admin" />
-                    <Label htmlFor="login-admin">Admin</Label>
+                    <Label htmlFor="login-admin" className="text-xl">
+                      Admin
+                    </Label>
                   </div>
                 </RadioGroup>
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full text-xl">
                 Login
               </Button>
             </CardFooter>
           </form>
         </TabsContent>
 
+        {/* Signup Tab Content */}
         <TabsContent value="signup">
           <form onSubmit={handleSignup}>
             <CardHeader>
-              <CardTitle>Signup</CardTitle>
-              <CardDescription>Create your account</CardDescription>
+              <CardTitle className="text-3xl font-bold">Signup</CardTitle>
+              <CardDescription className="text-xl">Create your account</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Full Name</Label>
+                <Label className="text-xl">Full Name</Label>
                 <Input
                   value={signupName}
                   onChange={(e) => setSignupName(e.target.value)}
                   required
+                  className="text-xl"
                 />
               </div>
               <div>
-                <Label>Email</Label>
+                <Label className="text-xl">Email</Label>
                 <Input
                   type="email"
                   value={signupEmail}
                   onChange={(e) => setSignupEmail(e.target.value)}
                   required
+                  className="text-xl"
                 />
               </div>
               <div>
-                <Label>Password</Label>
+                <Label className="text-xl">Password</Label>
                 <Input
                   type="password"
                   value={signupPassword}
                   onChange={(e) => setSignupPassword(e.target.value)}
                   required
+                  className="text-xl"
                 />
-                <div>
-                  <Label>Confirm Password</Label>
-                  <Input
-                    type="password"
-                    value={signupPasswordConfirm}
-                    onChange={(e) => setSignupPasswordConfirm(e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label>Mobile Number</Label>
-                  <Input
-                    value={mobileNumber}
-                    onChange={(e) => setMobileNumber(e.target.value)}
-                    required
-                  />
-                </div>
               </div>
+              <div>
+                <Label className="text-xl">Confirm Password</Label>
+                <Input
+                  type="password"
+                  value={signupPasswordConfirm}
+                  onChange={(e) => setSignupPasswordConfirm(e.target.value)}
+                  required
+                  className="text-xl"
+                />
+              </div>
+
+              {/* Shopkeeper Fields */}
               {signupRole === "shopkeeper" && (
                 <>
                   <div>
-                    <Label>Shop Name</Label>
+                    <Label className="text-xl">Shop Name</Label>
                     <Input
                       value={shopName}
                       onChange={(e) => setShopName(e.target.value)}
                       required
+                      className="text-xl"
                     />
                   </div>
                   <div>
-                    <Label>License Number</Label>
+                    <Label className="text-xl">Mobile Number</Label>
+                    <Input
+                      value={mobileNumber}
+                      onChange={(e) => setMobileNumber(e.target.value)}
+                      required
+                      className="text-xl"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xl">License Number</Label>
                     <Input
                       value={licenseNumber}
                       onChange={(e) => setLicenseNumber(e.target.value)}
                       required
+                      className="text-xl"
                     />
                   </div>
-
-                  <div className="space-y-4">
-                    <Dialog
-                      open={location.showMap}
-                      onOpenChange={(val) =>
-                        setLocation((prev) => ({ ...prev, showMap: val }))
-                      }
-                    >
-                      <DialogTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setLocation((prev) => ({ ...prev, showMap: true }));
-                          }}
-                        >
-                          📍 Select Location from Map
-                        </Button>
-                      </DialogTrigger>
-
-                      <DialogContent className="max-w-3xl">
-                        <DialogHeader>
-                          <DialogTitle>Select Location</DialogTitle>
-                        </DialogHeader>
-                        <div className="h-[400px]">
-                          <MapPicker
-                            onLocationSelect={(loc) => {
-                              setLocation({
-                                lat: loc.lat,
-                                lng: loc.lng,
-                                address: loc.address,
-                                showMap: false,
-                              });
-                              setLatitude(loc.lat);
-                              setLongitude(loc.lng);
-                              setAddress(loc.address);
-                            }}
-                          />
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-
-                    {location.address && (
-                      <div className="space-y-1 bg-gray-50 rounded-xl p-4 border text-sm shadow-sm">
-                        <p>
-                          <strong>Selected Address:</strong>{" "}
-                          <Badge variant="secondary">{location.address}</Badge>
-                        </p>
-                        {/* <p>
-        <strong>Latitude:</strong> <span>{location.lat}</span>
-      </p>
-      <p>
-        <strong>Longitude:</strong> <span>{location.lng}</span>
-      </p> */}
-                      </div>
-                    )}
+                  <div>
+                    <MapPicker
+                      setLatitude={setLatitude}
+                      setLongitude={setLongitude}
+                      setAddress={setAddress}
+                    />
                   </div>
                 </>
               )}
-              <div>
-                <Label>Register as:</Label>
-                <RadioGroup value={signupRole} onValueChange={setSignupRole}>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="customer" id="signup-customer" />
-                    <Label htmlFor="signup-customer">Customer</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="shopkeeper" id="signup-shopkeeper" />
-                    <Label htmlFor="signup-shopkeeper">Shopkeeper</Label>
-                  </div>
-                </RadioGroup>
-              </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full">
-                Create Account
+              <Button type="submit" className="w-full text-xl">
+                Signup
               </Button>
             </CardFooter>
           </form>

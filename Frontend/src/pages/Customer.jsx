@@ -41,20 +41,18 @@ const Customer = () => {
       setUserLocation({ lat: 28.6139, lng: 77.209 });
     }
   }, []);
-  // console.log("customer page ");
-  // console.log(currentUser);
 
   if (!currentUser || currentUser.role !== "customer") {
     return null;
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50 text-lg">
       <Header />
 
       <main className="flex-1 container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-3xl md:text-4xl font-bold">
             Welcome, {currentUser.data.customer.data.name}
           </h1>
           <Button onClick={() => setShowOrderHistory((prev) => !prev)}>
@@ -73,7 +71,7 @@ const Customer = () => {
       </main>
 
       <footer className="bg-white py-4 border-t">
-        <div className="container mx-auto px-4 text-center text-sm text-gray-600">
+        <div className="container mx-auto px-4 text-center text-base md:text-lg text-gray-600">
           &copy; {new Date().getFullYear()} TradiTech. All rights reserved.
         </div>
       </footer>

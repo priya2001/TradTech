@@ -18,7 +18,7 @@ import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 
 const OrderForm = () => {
-  const { currentUser, selectedShop ,setSelectedShop} = useAppContext();
+  const { currentUser, selectedShop, setSelectedShop } = useAppContext();
   const { toast } = useToast();
 
   const [glassCount, setGlassCount] = useState(1);
@@ -56,42 +56,40 @@ const OrderForm = () => {
     setIsOrdering(true);
 
     try {
-  const res = await axios.post(
-    "http://localhost:3000/api/customers/order-juice",
-    {
-      shopId: selectedShop.id,
-      glassSize,
-      quantity: glassCount,
-      paymentMethod,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }
-  );
+      const res = await axios.post(
+        "http://localhost:3000/api/customers/order-juice",
+        {
+          shopId: selectedShop.id,
+          glassSize,
+          quantity: glassCount,
+          paymentMethod,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       setSelectedShop(null);
-  toast({
-    title: "Order placed!",
-    description: `Your order for ${glassCount} glass${glassCount > 1 ? "es" : ""} has been placed`,
-  });
-
-} catch (error) {
-  console.error("Order failed:", error.response?.data || error.message);
-  toast({
-    title: "Order failed",
-    description: error.response?.data?.message || "Something went wrong",
-    variant: "destructive",
-  });
-}
- 
+      toast({
+        title: "Order placed!",
+        description: `Your order for ${glassCount} glass${glassCount > 1 ? "es" : ""} has been placed`,
+      });
+    } catch (error) {
+      console.error("Order failed:", error.response?.data || error.message);
+      toast({
+        title: "Order failed",
+        description: error.response?.data?.message || "Something went wrong",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
     <Card className="shadow-md">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Glass className="h-5 w-5 text-primary" />
+        <CardTitle className="text-xl flex items-center gap-2">
+          <Glass className="h-6 w-6 text-primary" />
           Order Juice
         </CardTitle>
       </CardHeader>
@@ -99,15 +97,17 @@ const OrderForm = () => {
         {selectedShop ? (
           <>
             <div className="mb-4">
-              <p className="text-sm font-medium">
+              <p className="text-base font-semibold">
                 Selected Shop: {selectedShop.name}
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-5 text-base">
               {/* Glass size */}
               <div className="space-y-2">
-                <Label htmlFor="glass-size">Glass Size (ml)</Label>
+                <Label htmlFor="glass-size" className="text-base font-semibold">
+                  Glass Size (ml)
+                </Label>
                 <div className="flex gap-2">
                   {[250, 500].map((size) => (
                     <Button
@@ -123,7 +123,9 @@ const OrderForm = () => {
 
               {/* Glass quantity */}
               <div className="space-y-2">
-                <Label htmlFor="glass-count">Number of Glasses</Label>
+                <Label htmlFor="glass-count" className="text-base font-semibold">
+                  Number of Glasses
+                </Label>
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
@@ -155,17 +157,17 @@ const OrderForm = () => {
               </div>
 
               {/* Sugarcane info */}
-              <div className="bg-gray-50 p-3 rounded-md">
+              <div className="bg-gray-50 p-4 rounded-md">
                 <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-1 text-sm font-medium">
-                    <Sugarcane className="h-4 w-4 text-sugarcane" />
+                  <div className="flex items-center gap-1 text-base font-semibold">
+                    <Sugarcane className="h-5 w-5 text-sugarcane" />
                     Sugarcane required:
                   </div>
                   <span className="font-semibold">{sugarcanesNeeded}</span>
                 </div>
 
                 {!hasEnoughBatteryForOrder && (
-                  <div className="text-xs text-red-500 mt-1">
+                  <div className="text-sm text-red-500 mt-1 font-medium">
                     Warning: Low battery. The machine may not be able to
                     complete this order.
                   </div>
@@ -174,7 +176,9 @@ const OrderForm = () => {
 
               {/* Payment method */}
               <div className="space-y-2">
-                <Label>Payment Method</Label>
+                <Label className="text-base font-semibold">
+                  Payment Method
+                </Label>
                 <div className="flex gap-2">
                   {["cash", "card", "online"].map((method) => (
                     <Button
@@ -190,7 +194,7 @@ const OrderForm = () => {
 
               {/* Submit button */}
               <Button
-                className="w-full"
+                className="w-full text-lg"
                 onClick={handleOrder}
                 disabled={isOrdering || !selectedShop || glassCount < 1}
               >
@@ -199,7 +203,7 @@ const OrderForm = () => {
             </div>
           </>
         ) : (
-          <div className="text-center py-6 text-gray-500">
+          <div className="text-center py-6 text-gray-500 text-base">
             Please select a shop from the map to place an order
           </div>
         )}

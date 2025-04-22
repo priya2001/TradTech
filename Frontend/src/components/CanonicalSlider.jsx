@@ -98,28 +98,29 @@ const CanonicalSlider = ({
   const gradientRotation = 225 - (value / (max - min)) * 270;
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div
-        ref={sliderRef}
-        className="canonical-slider"
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
-        style={{
-          background: `conic-gradient(from ${gradientRotation}deg, ${color}, #FFC107)`,
-        }}
-      >
-        <div
-          className="canonical-slider-handle"
-          style={{
-            left: `${x}px`,
-            top: `${y}px`,
-            backgroundColor: color,
-          }}
-        />
-        <div className="canonical-slider-value">{value}%</div>
-      </div>
-      <div className="text-sm font-medium mt-2">{label}</div>
-    </div>
+<div className="flex flex-col items-center gap-2">
+  <div
+    ref={sliderRef}
+    className="canonical-slider"
+    onMouseDown={handleMouseDown}
+    onTouchStart={handleTouchStart}
+    style={{
+      background: `conic-gradient(from ${gradientRotation}deg, ${color}, #FFC107)`,
+    }}
+  >
+    <div
+      className="canonical-slider-handle"
+      style={{
+        left: `${x}px`,
+        top: `${y}px`,
+        backgroundColor: color,
+      }}
+    />
+    <div className="canonical-slider-value text-xl font-semibold">{value}%</div>
+  </div>
+  <div className="text-xl font-semibold mt-2">{label}</div>
+</div>
+
   );
 };
 
