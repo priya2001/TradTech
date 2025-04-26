@@ -2,7 +2,7 @@ import defaultImg from "../assets/default.webp";
 import adminImg from "../assets/admin.webp";
 import customerImg from "../assets/customer.webp";
 import shopkeeperImg from "../assets/shopkeeper.webp";
-// import EditProfile from '../pages/EditProfile';
+
 
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -69,39 +69,38 @@ const Header = () => {
                   />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-  align="end"
-  className="bg-white text-black rounded-2xl shadow-2xl w-72 py-3 text-xl"
->
-  <DropdownMenuItem asChild>
-    <Link
-      to="/profile/edit"
-      className="block px-6 py-4 hover:bg-gray-100 font-semibold text-xl"
-    >
-      ✏️ Edit Profile
-    </Link>
-  </DropdownMenuItem>
+                  align="end"
+                  className="bg-white text-black rounded-2xl shadow-2xl w-72 py-3 text-xl"
+                >
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/profile/edit"
+                      className="block px-6 py-4 hover:bg-gray-100 font-semibold text-xl"
+                    >
+                      ✏️ Edit Profile
+                    </Link>
+                  </DropdownMenuItem>
 
-  <DropdownMenuItem asChild>
-    <Link
-      to="/profile/change-password"
-      className="block px-6 py-4 hover:bg-gray-100 font-semibold text-xl"
-    >
-      🔒 Change Password
-    </Link>
-  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/profile/change-password"
+                      className="block px-6 py-4 hover:bg-gray-100 font-semibold text-xl"
+                    >
+                      🔒 Change Password
+                    </Link>
+                  </DropdownMenuItem>
 
-  <DropdownMenuSeparator className="my-2" />
+                  <DropdownMenuSeparator className="my-2" />
 
-  <DropdownMenuItem asChild>
-    <button
-      onClick={logout}
-      className="w-full text-left px-6 py-4 text-red-600 hover:bg-red-100 font-bold text-xl"
-    >
-      🚪 Logout
-    </button>
-  </DropdownMenuItem>
-</DropdownMenuContent>
-
+                  <DropdownMenuItem asChild>
+                    <button
+                      onClick={logout}
+                      className="w-full text-left px-6 py-4 text-red-600 hover:bg-red-100 font-bold text-xl"
+                    >
+                      🚪 Logout
+                    </button>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
               </DropdownMenu>
             </>
           ) : (

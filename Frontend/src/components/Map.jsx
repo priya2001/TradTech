@@ -10,7 +10,6 @@ import { useAppContext } from "../lib/context";
 import { calculateDistance } from "../lib/calculations";
 import { useToast } from "../components/ui/use-toast";
 
-// Dynamic import for Google Maps to work with Vite
 const { LoadScript, GoogleMap, Marker, DirectionsRenderer } = await import(
   "@react-google-maps/api"
 );
@@ -51,7 +50,6 @@ const MapView = ({
     });
   };
 
-  // Get user's current location
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -60,7 +58,6 @@ const MapView = ({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
-          console.log(pos);
           setUserLocation(pos);
         },
         () => {
@@ -71,7 +68,7 @@ const MapView = ({
   }, []);
 
   const allShops = locations?.data?.shops || [];
-// console.log(allShops)
+
   const getLatLng = (shop) => ({
     lat: shop.location.coordinates[0],
     lng: shop.location.coordinates[1],
@@ -107,14 +104,14 @@ const MapView = ({
   };
 
   return (
-    <Card className="shadow-md">
+    <Card className="shadow-2x1 border-2 border-black">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg">
+        <CardTitle className="text-xl-bold text-black">
           {showOnlyNearest ? "Nearest Shops" : "Nearby Shops"}
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="mb-4 rounded-md overflow-hidden">
+        <div className="mb-4 rounded-md overflow-hidden bg-white bg-opacity-90 p-2 shadow-md">
           <LoadScript
             googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
             onLoad={() => setMapLoaded(true)}
@@ -125,7 +122,6 @@ const MapView = ({
               zoom={14}
               onLoad={handleLoad}
             >
-              {/* User Marker */}
               {userLocation && (
                 <Marker
                   position={userLocation}
@@ -135,7 +131,6 @@ const MapView = ({
                 />
               )}
 
-              {/* Shop Markers */}
               {mapLoaded &&
                 allShops.map((shop) => (
                   <Marker
@@ -151,20 +146,18 @@ const MapView = ({
                   />
                 ))}
 
-              {/* Directions */}
               {directions && <DirectionsRenderer directions={directions} />}
             </GoogleMap>
           </LoadScript>
         </div>
 
-        {/* Shops List */}
         <div className="space-y-2 max-h-60 overflow-y-auto mt-4">
           {allShops.map((shop) => (
             <div
               key={shop.id}
               className={`p-3 rounded-md cursor-pointer transition-colors ${
                 selectedShop?.id === shop.id
-                  ? "bg-primary/10 border border-primary/30"
+                  ? "bg-black/10 border border-black"
                   : "bg-gray-50 hover:bg-gray-100 border border-transparent"
               }`}
               onClick={() => handleShopSelect(shop)}

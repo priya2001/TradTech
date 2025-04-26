@@ -5,6 +5,7 @@ import AuthForm from "../components/AuthForm";
 import { SolarPanel } from "../components/Icons";
 import { useAppContext } from "../lib/context";
 import MapView from "../components/Map";
+import bg from "../assets/sugarcane.jpg";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -45,7 +46,8 @@ const Landing = () => {
   }, [shops, userLocation]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-cover bg-center"
+    style={{ backgroundImage: `url(${bg})` }}>
       {/* Header */}
       <header className="py-8 text-primary-foreground">
         <div className="container mx-auto px-4">

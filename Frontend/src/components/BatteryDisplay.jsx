@@ -23,34 +23,34 @@ const BatteryDisplay = ({
     : 0;
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Battery className="text-sugarcane inline-block" />
+    <div className="p-6 bg-white rounded-2xl shadow-xl">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-xl font-semibold flex items-center gap-2 text-dark">
+          <Battery className="text-primary inline-block" />
           Battery Status
         </h3>
         {isCharging && (
-          <div className="text-xs px-2 py-1 bg-solar-light/20 text-solar-dark rounded-full flex items-center animate-pulse-charging">
+          <div className="text-xs px-3 py-1 bg-solar-light/20 text-solar-dark rounded-full flex items-center animate-pulse-charging">
             <span className="h-2 w-2 bg-solar rounded-full mr-1"></span>
             Charging
           </div>
         )}
       </div>
 
-      <div className="mb-4">
-        <div className="flex justify-between text-sm mb-1">
+      <div className="mb-5">
+        <div className="flex justify-between text-sm mb-2">
           <span>Level</span>
-          <span className="font-semibold">{batteryPercentage.toFixed(1)}%</span>
+          <span className="font-semibold text-dark">{batteryPercentage.toFixed(1)}%</span>
         </div>
         <Progress
           value={batteryPercentage}
-          className="h-3"
+          className="h-3 rounded-full"
           indicatorClassName={getColor()}
         />
       </div>
 
       {isCharging && (
-        <div className="text-sm text-gray-600 mb-4">
+        <div className="text-sm text-gray-600 mb-5">
           <span className="font-medium">Est. time to full charge:</span>{" "}
           {hoursToFullCharge < 1
             ? `${Math.round(hoursToFullCharge * 60)} minutes`
@@ -58,40 +58,40 @@ const BatteryDisplay = ({
         </div>
       )}
 
-      <div className="border-t pt-2">
-        <h4 className="text-sm font-medium mb-2">Connected Appliances</h4>
-        <div className="flex items-center justify-around gap-2">
+      <div className="border-t pt-4">
+        <h4 className="text-sm font-medium mb-3 text-dark">Connected Appliances</h4>
+        <div className="flex items-center justify-around gap-3">
           <div
-            className={`text-center p-2 rounded ${
+            className={`text-center p-3 rounded-xl ${
               isPaymentMachineOn
                 ? "bg-sugarcane-light/20 text-sugarcane-dark"
                 : "bg-gray-100 text-gray-400"
             }`}
           >
-            <PaymentMachine className="h-5 w-5 mx-auto" />
+            <PaymentMachine className="h-6 w-6 mx-auto" />
             <span className="text-xs block mt-1">Payment</span>
           </div>
 
           <div
-            className={`text-center p-2 rounded ${
+            className={`text-center p-3 rounded-xl ${
               isLightOn
                 ? "bg-solar-light/20 text-solar-dark"
                 : "bg-gray-100 text-gray-400"
             }`}
           >
-            <Lightbulb className="h-5 w-5 mx-auto" />
+            <Lightbulb className="h-6 w-6 mx-auto" />
             <span className="text-xs block mt-1">Light</span>
           </div>
 
           <div
-            className={`text-center p-2 rounded ${
+            className={`text-center p-3 rounded-xl ${
               fanSpeed !== "off"
                 ? "bg-blue-100 text-blue-700"
                 : "bg-gray-100 text-gray-400"
             }`}
           >
             <Fan
-              className={`h-5 w-5 mx-auto ${
+              className={`h-6 w-6 mx-auto ${
                 fanSpeed !== "off" ? "animate-spin-slow" : ""
               }`}
             />

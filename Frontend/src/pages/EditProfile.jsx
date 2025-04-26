@@ -25,14 +25,12 @@ const EditProfile = () => {
     setError("");
     setSuccess("");
 
-    // Check token in localStorage
     const token = localStorage.getItem("token");
     if (!token) {
       setError("Token is missing. Please login again.");
       setLoading(false);
       return;
     }
-    console.log("Token from localStorage:", token);
 
     try {
       const res = await fetch("http://localhost:5000/api/auth/update-profile", {
@@ -50,7 +48,7 @@ const EditProfile = () => {
         throw new Error(data.message || "Something went wrong");
       }
 
-      setSuccess("Profile updated successfully!");
+      setSuccess("🌿 Profile updated successfully!");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -59,45 +57,45 @@ const EditProfile = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-[#dbeafe] via-[#e0f2fe] to-[#f0f9ff] py-10 px-4">
-      <div className="bg-white w-full max-w-md p-8 rounded-xl shadow-xl shadow-sky-100/50 transition-transform duration-300 hover:scale-[1.01]">
-        <h2 className="text-3xl font-semibold mb-6 text-center text-gray-800">Edit Profile</h2>
+    <div className="min-h-screen flex justify-center items-center bg-[url('/bamboo-bg.png')] bg-cover bg-no-repeat backdrop-blur-md px-4 py-10">
+      <div className="bg-white/90 w-full max-w-lg p-10 rounded-3xl shadow-2xl shadow-green-300 transition-transform duration-500 hover:scale-[1.015] border-2 border-green-200">
+        <h2 className="text-4xl font-extrabold mb-8 text-center text-green-900">🍀 Edit Profile</h2>
 
-        {success && <p className="text-green-600 mb-4 text-center">{success}</p>}
-        {error && <p className="text-red-600 mb-4 text-center">{error}</p>}
+        {success && <p className="text-green-700 mb-4 text-center text-lg font-semibold">{success}</p>}
+        {error && <p className="text-red-600 mb-4 text-center text-lg font-medium">{error}</p>}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6 text-lg">
           <div>
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name" className="text-green-900 font-semibold text-lg">Name</Label>
             <Input
               id="name"
-              placeholder="Enter Name"
+              placeholder="Enter your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="shadow-sm focus:ring-2 focus:ring-sky-300"
+              className="shadow-md text-lg focus:ring-2 focus:ring-green-400 text-green-800"
             />
           </div>
 
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-green-900 font-semibold text-lg">Email</Label>
             <Input
               id="email"
-              placeholder="Enter Email"
+              placeholder="Enter your email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="shadow-sm focus:ring-2 focus:ring-sky-300"
+              className="shadow-md text-lg focus:ring-2 focus:ring-green-400 text-green-800"
             />
           </div>
 
           <Button
             type="submit"
-            className="w-full mt-4 bg-blue-500 hover:bg-blue-600 transition duration-200"
+            className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-lg font-bold rounded-2xl transition duration-200"
             disabled={loading}
           >
-            {loading ? "Updating..." : "Update"}
+            {loading ? "🌿 Updating..." : "✅ Update Profile"}
           </Button>
         </form>
       </div>
